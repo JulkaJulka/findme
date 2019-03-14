@@ -2,6 +2,7 @@ package com.findme.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.findme.model.Post;
+import com.findme.service.PostServiceImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,13 +17,27 @@ import java.io.InputStream;
 @EnableWebMvc
 public class PostController {
 
+    private PostServiceImpl postService;
+
+    public PostController(PostServiceImpl postService) {
+        this.postService = postService;
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/Post/save", produces = "application/json")
+    public @ResponseBody
+    String saveUser(HttpServletRequest req) {
+        Post post = convertJSONStringToPost(req);
+
+        return postService.save(post).toString() + "was saving successful";
+    }
+
     @RequestMapping(method = RequestMethod.POST, value = "/testPost")
     public @ResponseBody
     String testPost(HttpServletRequest req) {
-        return convertJSONStringToUser(req).toString();
+        return convertJSONStringToPost(req).toString();
     }
 
-    private Post convertJSONStringToUser(HttpServletRequest req) {
+    private Post convertJSONStringToPost(HttpServletRequest req) {
         ObjectMapper mapper = new ObjectMapper();
         try (InputStream is = req.getInputStream()) {
             Post post = mapper.readValue(is, Post.class);

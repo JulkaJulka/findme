@@ -124,13 +124,13 @@ public class User {
     }
 
     @JsonIgnore
-    @OneToMany(targetEntity = Message.class, fetch = FetchType.LAZY, mappedBy = "userFrom", orphanRemoval = true)
+    @OneToMany(targetEntity = Message.class, fetch = FetchType.LAZY, mappedBy = "userFrom",cascade = CascadeType.ALL)
     public List<Message> getMessagesSent() {
         return messagesSent;
     }
 
     @JsonIgnore
-    @OneToMany(targetEntity = Message.class, fetch = FetchType.LAZY, mappedBy = "userTo", orphanRemoval = true)
+    @OneToMany(targetEntity = Message.class, fetch = FetchType.LAZY, mappedBy = "userTo", cascade = CascadeType.ALL)
     public List<Message> getMessagesReceived() {
         return messagesReceived;
     }
@@ -229,8 +229,8 @@ public class User {
                 ", age=" + age +
                 ", dateRegistrated=" + dateRegistrated +
                 ", lastDateActivited=" + lastDateActivited +
-                ", relationshipStatus='" + relationshipStatus + '\'' +
-                ", religion='" + religion + '\'' +
+                ", relationshipStatus=" + relationshipStatus +
+                ", religion=" + religion +
                 ", school='" + school + '\'' +
                 ", university='" + university + '\'' +
                 '}';

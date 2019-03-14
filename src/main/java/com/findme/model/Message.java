@@ -24,6 +24,7 @@ public class Message {
     @Id
     @SequenceGenerator(name = "MES_SEQ", sequenceName = "MES_SEQ", allocationSize = 1)
     @GeneratedValue(generator = "MES_SEQ", strategy = GenerationType.SEQUENCE)
+    @Column(name = "ID_MS")
     public Long getId() {
         return id;
     }
@@ -48,14 +49,14 @@ public class Message {
     }
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "USER_FROM", nullable = false)
+    @JoinColumn(name = "USER_FROM")
     @JsonIgnore
     public User getUserFrom() {
         return userFrom;
     }
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "USER_TO", nullable = false)
+    @JoinColumn(name = "USER_TO")
     @JsonIgnore
     public User getUserTo() {
         return userTo;

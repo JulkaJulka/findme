@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+
+    <title>Find me</title>
+</head>
+<body>
+<div>
+    <div class="left">
+        <h1>Photo</h1>
+
+        <div>
+            <button class="btn">Send message</button>
+        </div>
+    </div>
+    <!--<div class="right">
+        Styled text here-->
+       <!-- <p th:text="${text}"></p>-->
+    <div class="bblock">
+    <p>First name:</p>
+    <p>Last name:</p>
+        <p>Phone:</p>
+        <p>Country:</p>
+        <p>City:</p>
+        <p>Age:</p>
+        <p>Date registrated:</p>
+        <p>Last date activated:</p>
+        <p>Relationship status:</p>
+        <p>Religion:</p>
+        <p>School:</p>
+        <p>University:</p>
+    </div>
+    <div class="bblock">
+          <p th:text="${user.firstName}"></p>
+        <p th:text="${user.lastName}"></p>
+        <p th:text="${user.phone}"></p>
+        <p th:text="${user.country}"></p>
+        <p th:text="${user.city}"></p>
+        <p th:text="${user.age}"></p>
+        <p th:text="${user.dateRegistrated}"></p>
+        <p th:text="${user.lastDateActivited}"></p>
+        <p th:text="${user.relationshipStatus}"></p>
+        <p th:text="${user.religion}"></p>
+        <p th:text="${user.school}"></p>
+        <p th:text="${user.university}"></p>
+    </div>
+</div>
+</div>
+
+</body>
+<style>
+    .left{
+        float: left;
+        width: 200px;
+        height: 300px;
+        border-style: solid;
+    }
+    .right{
+        margin-left: 800px;
+    }
+
+    .btn{
+        margin-top: 230px;
+    }
+    .bblock {
+        float: left; /*Задаем обтекание*/
+        font-size: 40px;
+        width: 150px; /*Фиксируем ширину блока*/
+        margin-right: 10px;
+        text-align: left; /*Центрируем текст по горизонтали*/
+    }
+</style>
+</html>
+

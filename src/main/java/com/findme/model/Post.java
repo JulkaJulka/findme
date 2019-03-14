@@ -1,6 +1,7 @@
 package com.findme.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -36,6 +37,7 @@ public class Post {
         return datePosted;
     }
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "USER_POSTED", nullable = false)
     public User getUserPosted() {
