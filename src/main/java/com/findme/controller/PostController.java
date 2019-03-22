@@ -2,7 +2,7 @@ package com.findme.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.findme.model.Post;
-import com.findme.service.PostServiceImpl;
+import com.findme.service.PostService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,9 +17,9 @@ import java.io.InputStream;
 @EnableWebMvc
 public class PostController {
 
-    private PostServiceImpl postService;
+    private PostService postService;
 
-    public PostController(PostServiceImpl postService) {
+    public PostController(PostService postService) {
         this.postService = postService;
     }
 

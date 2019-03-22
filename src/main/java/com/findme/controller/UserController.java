@@ -2,60 +2,65 @@ package com.findme.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.findme.BadRequestException;
+import com.findme.NotFoundException;
 import com.findme.model.User;
 import com.findme.service.UserService;
-import com.findme.service.UserServiceImpl;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 @Controller
 @EnableWebMvc
 public class UserController {
-    private UserServiceImpl userService;
+    private UserService userService;
 
-    public UserController(UserServiceImpl userService) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @RequestMapping(path = "/user/{userId}", method = RequestMethod.GET)
-    public String profile(Model model, @PathVariable String userId){
+    public String profile(Model model, @PathVariable String userId) {
 
-        Long idLong = Long.parseLong(userId);
 
         try {
+            Long idLong = Long.parseLong(userId);
+            model.addAttribute("userId", idLong);
+
             User user = userService.findOne(idLong);
-            if(user == null)
-                return "notFound";
-            model.addAttribute("user",user);
+            model.addAttribute("user", user);
             return "profile";
 
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
+            return "badRequestExcp";
+
+        } catch (NotFoundException e) {
+            return "notFoundException";
+
+        } catch (Exception e){
             return "systemError";
         }
 
     }
+
     @RequestMapping(path = "/user", method = RequestMethod.GET)
-    public String profile1(Model model, @PathVariable String userId){
+    public String profile1(Model model, @PathVariable String userId) {
         User user = new User();
         user.setFirstName("Julka");
         user.setCity("Kyiv");
-        model.addAttribute("user",user);
+        model.addAttribute("user", user);
         return "profile";
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/findUser", produces = "text/plain")
+    /*@RequestMapping(method = RequestMethod.POST, value = "/findUser", produces = "text/plain")
     public @ResponseBody
     String findUser(HttpServletRequest req) {
         String idUser = req.getParameter("idUser");
@@ -66,7 +71,7 @@ public class UserController {
         if (user == null)
             return "User id " + id + " doesn't exist in DB";
         return user.toString();
-    }
+    }*/
 
     @RequestMapping(method = RequestMethod.POST, value = "/User/save", produces = "application/json")
     public @ResponseBody
@@ -87,6 +92,8 @@ public class UserController {
 
         } catch (BadRequestException e) {
             return "Update unsuccessful " + e.getMessage();
+        } catch (NotFoundException e) {
+            return "Update unsuccessful " + e.getMessage();
         }
     }
 
@@ -104,6 +111,9 @@ public class UserController {
         } catch (BadRequestException e) {
             e.printStackTrace();
             return "Deleting unsuccessful " + e.getMessage();
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            return "Deleting unsuccessful " + e.getMessage();
         }
     }
 
@@ -116,7 +126,7 @@ public class UserController {
     private User convertJSONStringToUser(HttpServletRequest req) {
         ObjectMapper mapper = new ObjectMapper();
         try (InputStream is = req.getInputStream()) {
-             User user = mapper.readValue(is, User.class);
+            User user = mapper.readValue(is, User.class);
 
             return user;
         } catch (IOException e) {
