@@ -25,7 +25,7 @@ public class GenericDAOImpl<T> implements GenericDAO<T>{
 
 
     @Override
-    public T findOne(Serializable id)  {
+    public T findOne(Long id)  {
         return entityManager.find(type, id);
     }
 
@@ -38,7 +38,7 @@ public class GenericDAOImpl<T> implements GenericDAO<T>{
 
     @Override
    @Transactional
-    public void delete(Serializable id) throws BadRequestException {
+    public void delete(Long id) {
         entityManager.remove(findOne(id));
     }
 
