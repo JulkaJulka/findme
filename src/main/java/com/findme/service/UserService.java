@@ -20,7 +20,7 @@ public class UserService {
         User user = userDAO.findOne( id);
         if (user == null)
             throw new NotFoundException("User id " + id + " not found in DB");
-        return userDAO.findOne( id);
+        return user;
     }
 
     public User save(User entity) {

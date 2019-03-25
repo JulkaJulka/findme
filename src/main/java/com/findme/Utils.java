@@ -1,12 +1,12 @@
 package com.findme;
 
 public class Utils {
-    public static boolean checkWordOnDigts(String body) throws BadRequestException {
-        char[] chars = body.toCharArray();
-        for (char ch : chars) {
-            if (!Character.isDigit(ch))
-               throw new BadRequestException("Wrong data input");
-        }
-        return true;
+    public static boolean checkWordOnDigts(String id) throws BadRequestException {
+       try{
+           Long idLong = Long.valueOf(id);
+           return true;
+       } catch (NumberFormatException e){
+           throw new BadRequestException("Wrong data input");
+       }
     }
 }
