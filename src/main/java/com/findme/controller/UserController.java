@@ -32,7 +32,7 @@ public class UserController {
 
 
         try {
-            Long idLong = Long.parseLong(userId);
+            Long idLong = Long.valueOf(userId);
             model.addAttribute("userId", idLong);
 
             User user = userService.findOne(idLong);

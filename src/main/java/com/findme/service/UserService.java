@@ -2,10 +2,7 @@ package com.findme.service;
 
 import com.findme.BadRequestException;
 import com.findme.NotFoundException;
-import com.findme.Utils;
 import com.findme.dao.GenericDAOImpl;
-import com.findme.dao.UserDAO;
-import com.findme.dao.UserDAOImpl;
 import com.findme.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,8 +12,7 @@ public class UserService {
 @Autowired
     private GenericDAOImpl<User> userDAO;
 
-    public User findOne(Long id) throws NotFoundException, BadRequestException {
-        Utils.checkWordOnDigts(id.toString());
+    public User findOne(Long id) throws NotFoundException {
         User user = userDAO.findOne( id);
         if (user == null)
             throw new NotFoundException("User id " + id + " not found in DB");
@@ -28,13 +24,11 @@ public class UserService {
     }
 
     public void delete(Long id) throws NotFoundException, BadRequestException {
-        Utils.checkWordOnDigts(id.toString());
         checkExistenceEntityInDB(id);
         userDAO.delete(id);
     }
 
     public User update(User entity) throws BadRequestException, NotFoundException  {
-        Utils.checkWordOnDigts(entity.getId().toString());
         checkExistenceEntityInDB(entity.getId());
         return  userDAO.update(entity);
 
