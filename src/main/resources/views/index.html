@@ -282,21 +282,6 @@
         })
     });
 
-    $("#registration-form").submit(function (e) {
-
-        $.ajax({
-            url: "/user-registration",
-            type: "POST",
-            data: $('#registration-form').serialize(),
-            success: function success(data) {
-                window.open('', '', 'width=200,height=200');
-                alert("success");
-            },
-            error: function error(xhr) {
-                alert("error!");
-            }
-        })
-    });
 
    $("#form-registration").submit(function (e) {
         var form = $(this).serialize();
