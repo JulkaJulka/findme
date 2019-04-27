@@ -3,28 +3,34 @@ package com.findme.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.findme.BadRequestException;
 import com.findme.NotFoundException;
+import com.findme.dao.UserDAOImpl;
 import com.findme.model.User;
 import com.findme.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 @Controller
 @EnableWebMvc
 public class UserController {
     private UserService userService;
+    //private UserDAOImpl userDAO;
+
+   /* public UserController(UserService userService, UserDAOImpl userDAO) {
+        this.userService = userService;
+        this.userDAO = userDAO;
+    }*/
 
     public UserController(UserService userService) {
-        this.userService = userService;
+       this.userService = userService;
     }
 
     @RequestMapping(path = "/user/{userId}", method = RequestMethod.GET)
@@ -48,6 +54,25 @@ public class UserController {
         } catch (Exception e){
             return "systemError";
         }
+
+    }
+
+    @RequestMapping(path = "/user-registration", method = RequestMethod.POST)
+@ResponseBody
+    public String  registerUser(@ModelAttribute User user)throws BadRequestException{
+       try{
+           user.setDateRegistrated(new Date());
+           user.setLastDateActivited(new Date());
+
+          return userService.save(user).toString();
+
+       } catch (BadRequestException e){
+           System.out.println("bad");
+           throw new BadRequestException("already exist");
+
+       }catch (Exception e){
+           return "systemError";
+       }
 
     }
 
@@ -78,7 +103,11 @@ public class UserController {
     String saveUser(HttpServletRequest req) {
         User user = convertJSONStringToUser(req);
 
-        return userService.save(user).toString() + "was saving successful";
+        try {
+            return userService.save(user).toString() + "was saving successful";
+        } catch (BadRequestException e ){
+            return "Save unsuccessful " + e.getMessage();
+        }
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/User/update", produces = "application/json")

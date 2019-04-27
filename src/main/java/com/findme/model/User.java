@@ -32,6 +32,11 @@ public class User {
     private List<Message> messagesSent;
     private List<Message> messagesReceived;
 
+    private String password;
+    private String email;
+   // private UserType userType;
+    //private boolean loginStatus;
+
     // private String[] interests;
 
     public User() {
@@ -58,6 +63,16 @@ public class User {
     @Column(name = "PHONE")
     public String getPhone() {
         return phone;
+    }
+
+    @Column(name = "EMAIL")
+    public String getEmail() {
+        return email;
+    }
+
+    @Column(name = "PASSWORD")
+    public String getPassword() {
+        return password;
     }
 
     @Column(name = "COUNTRY")
@@ -151,6 +166,14 @@ public class User {
         this.phone = phone;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public void setCountry(String country) {
         this.country = country;
     }
@@ -208,13 +231,14 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id);
+        return Objects.equals(phone, user.phone) ||
+                Objects.equals(email, user.email);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(id);
+        return Objects.hash(phone, email);
     }
 
     @Override
@@ -233,6 +257,8 @@ public class User {
                 ", religion=" + religion +
                 ", school='" + school + '\'' +
                 ", university='" + university + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
                 '}';
     }
 }
