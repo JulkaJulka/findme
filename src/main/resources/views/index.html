@@ -289,18 +289,19 @@
             type: "POST",
             url: "/user-registration",
             data: form,
+
             success: function success() {
                 debugger;
                 alert("User has registered success!");
-                window.location.href = "testForRedirect.html";
+                window.location.href = 'testForRedirect.html';
                // $(this).load('testForRedirect.html');
             },
             error: function error() {
                 debugger;
                 alert( "The user with email or " +
                     "phone is already registered in DB.");
-                //window.location.href = "testForRedirect.html";
-                $(this).load('testForRedirect.html');
+                window.location.href = 'testForRedirect.html';
+               // $(this).load('testForRedirect.html');
 
             }
         });

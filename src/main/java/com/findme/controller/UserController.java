@@ -6,6 +6,8 @@ import com.findme.NotFoundException;
 import com.findme.dao.UserDAOImpl;
 import com.findme.model.User;
 import com.findme.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +32,7 @@ public class UserController {
     }*/
 
     public UserController(UserService userService) {
-       this.userService = userService;
+        this.userService = userService;
     }
 
     @RequestMapping(path = "/user/{userId}", method = RequestMethod.GET)
@@ -51,28 +53,26 @@ public class UserController {
         } catch (NotFoundException e) {
             return "notFoundException";
 
-        } catch (Exception e){
+        } catch (Exception e) {
             return "systemError";
         }
 
     }
 
     @RequestMapping(path = "/user-registration", method = RequestMethod.POST)
-@ResponseBody
-    public String  registerUser(@ModelAttribute User user)throws BadRequestException{
-       try{
-           user.setDateRegistrated(new Date());
-           user.setLastDateActivited(new Date());
+    @ResponseBody
+    public ResponseEntity registerUser(@ModelAttribute User user) {
+        try {
+            user.setDateRegistrated(new Date());
+            user.setLastDateActivited(new Date());
+            userService.save(user);
+            return new ResponseEntity(HttpStatus.OK);
 
-          return userService.save(user).toString();
+        } catch (BadRequestException e) {
+            System.out.println("bad");
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
 
-       } catch (BadRequestException e){
-           System.out.println("bad");
-           throw new BadRequestException("already exist");
-
-       }catch (Exception e){
-           return "systemError";
-       }
+        }
 
     }
 
@@ -105,7 +105,7 @@ public class UserController {
 
         try {
             return userService.save(user).toString() + "was saving successful";
-        } catch (BadRequestException e ){
+        } catch (BadRequestException e) {
             return "Save unsuccessful " + e.getMessage();
         }
     }
