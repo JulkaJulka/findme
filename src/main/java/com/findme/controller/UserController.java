@@ -2,6 +2,7 @@ package com.findme.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.findme.BadRequestException;
+import com.findme.InternalServerException;
 import com.findme.NotFoundException;
 import com.findme.dao.UserDAOImpl;
 import com.findme.model.User;
@@ -66,12 +67,16 @@ public class UserController {
             user.setDateRegistrated(new Date());
             user.setLastDateActivited(new Date());
             userService.save(user);
-            return new ResponseEntity(HttpStatus.OK);
+            return new ResponseEntity("User registered successfully", HttpStatus.OK);
 
         } catch (BadRequestException e) {
             System.out.println("bad");
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("User can not registered in DB", HttpStatus.BAD_REQUEST);
 
+        } catch (HttpServerErrorException.InternalServerError ex) {
+            return new ResponseEntity("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (HttpServerErrorException.GatewayTimeout eg) {
+            return new ResponseEntity("Gatway timeout...", HttpStatus.GATEWAY_TIMEOUT);
         }
 
     }
