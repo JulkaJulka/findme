@@ -75,8 +75,6 @@ public class UserController {
 
         } catch (HttpServerErrorException.InternalServerError ex) {
             return new ResponseEntity("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (HttpServerErrorException.GatewayTimeout eg) {
-            return new ResponseEntity("Gatway timeout...", HttpStatus.GATEWAY_TIMEOUT);
         }
 
     }
