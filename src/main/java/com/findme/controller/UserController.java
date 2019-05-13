@@ -62,19 +62,19 @@ public class UserController {
 
     @RequestMapping(path = "/user-registration", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity registerUser(@ModelAttribute User user) {
+    public ResponseEntity<String> registerUser(@ModelAttribute User user) {
         try {
             user.setDateRegistrated(new Date());
             user.setLastDateActivited(new Date());
             userService.save(user);
-            return new ResponseEntity("User registered successfully", HttpStatus.OK);
+            return new ResponseEntity<>("User registered successfully", HttpStatus.OK);
 
         } catch (BadRequestException e) {
             System.out.println("bad");
-            return new ResponseEntity("User can not registered in DB", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("User can not registered in DB", HttpStatus.BAD_REQUEST);
 
         } catch (HttpServerErrorException.InternalServerError ex) {
-            return new ResponseEntity("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
