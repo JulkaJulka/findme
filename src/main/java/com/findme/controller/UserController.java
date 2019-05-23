@@ -5,8 +5,10 @@ import com.findme.BadRequestException;
 import com.findme.InternalServerException;
 import com.findme.NotFoundException;
 import com.findme.dao.UserDAOImpl;
+import com.findme.model.LoginStatus;
 import com.findme.model.User;
 import com.findme.service.UserService;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,22 +17,20 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.Date;
 
 @Controller
 @EnableWebMvc
 public class UserController {
     private UserService userService;
-    //private UserDAOImpl userDAO;
-
-   /* public UserController(UserService userService, UserDAOImpl userDAO) {
-        this.userService = userService;
-        this.userDAO = userDAO;
-    }*/
+    private UserDAOImpl userDAO;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -62,8 +62,9 @@ public class UserController {
 
     @RequestMapping(path = "/user-registration", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<String> registerUser(@ModelAttribute User user) {
+    public ResponseEntity<String> registerUser(HttpSession session, @ModelAttribute User user) {
         try {
+            session.setAttribute("product1", "iphone");
             user.setDateRegistrated(new Date());
             user.setLastDateActivited(new Date());
             userService.save(user);
@@ -77,6 +78,64 @@ public class UserController {
             return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    @RequestMapping(path = "/login", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<String> loginUser(HttpServletRequest request, HttpServletResponse response, @ModelAttribute User user) throws IOException, ServletException {
+        try {
+            String email = request.getParameter("emailLog");
+            String password = request.getParameter("passwordLog");
+
+            HttpSession session = request.getSession();
+
+            if (session != null) {
+                User userFound = userService.checkExistanceUserInDB(email, password);
+
+                if (userFound == null) {
+                    session.invalidate();
+                    return new ResponseEntity<>("Wrong password or email. Try again please.", HttpStatus.NOT_FOUND);
+
+                } else if (userFound.getLoginStatus() == LoginStatus.SUSPEND) {
+                    return new ResponseEntity<>("Your account was blocked. Please, contact with administrator.", HttpStatus.FORBIDDEN);
+
+                } else if(userFound.getLoginStatus() == LoginStatus.LOGOUT){
+
+                userFound.setLoginStatus(LoginStatus.LOGIN);
+                userService.update(userFound);}
+
+                return new ResponseEntity<>("User successfully log in to FindMe", HttpStatus.OK);
+
+            } else {
+                return new ResponseEntity<>("Please, register in FindMe", HttpStatus.BAD_REQUEST);
+            }
+
+        } catch (BadRequestException e) {
+            return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
+        } catch (HttpServerErrorException.InternalServerError e) {
+            return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @RequestMapping(path = "/logout", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpServletResponse response, @ModelAttribute User user) {
+        try {
+            HttpSession session = request.getSession();
+            session.setAttribute("user", user);
+
+            user.setLoginStatus(LoginStatus.LOGOUT);
+            userService.update(user);
+            session.invalidate();
+            return new ResponseEntity<>("User logout successfully", HttpStatus.OK);
+
+        } catch (BadRequestException e) {
+            return new ResponseEntity<>("Badrequest", HttpStatus.BAD_REQUEST);
+
+        } catch (HttpServerErrorException.InternalServerError e) {
+            return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @RequestMapping(path = "/user", method = RequestMethod.GET)
@@ -124,9 +183,9 @@ public class UserController {
 
         } catch (BadRequestException e) {
             return "Update unsuccessful " + e.getMessage();
-        } catch (NotFoundException e) {
+        } /*catch (NotFoundException e) {
             return "Update unsuccessful " + e.getMessage();
-        }
+        }*/
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/User/delete", produces = "application/json")

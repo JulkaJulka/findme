@@ -44,7 +44,7 @@ public class GenericDAOImpl<T> implements GenericDAO<T>{
 
     @Transactional
     @Override
-    public T update(Object entity)  {
+    public T update(Object entity) throws BadRequestException  {
         return entityManager.merge( (T)entity);
     }
 }

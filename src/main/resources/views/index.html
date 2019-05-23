@@ -254,13 +254,32 @@
                     </div>
                 </div>
             </form>
-            <div class="right_block"><h2>Login</h2></div>
+            <div class="right_block"><h2>Log in to FindMe</h2>
+                <form id="form-login" action="/login">
+                    <div class="placeholder" aria-hidden="true">Email
+                    </div>
+                    <input path="email" type="email"
+                           class="inputtext _58mg _5dba _2ph-"
+                           name="emailLog" id="email2" placeholder="Email" required>
+                    <div class="placeholder" aria-hidden="true">Password
+                    </div>
+                    <input path="password" type="password"
+                           class="inputtext _58mg _5dba _2ph-"
+                           data-type="password" name="passwordLog"
+                           aria-label="New password" placeholder="Password" id="username" required>
+                    <div class="_58mq _5dbb" id="u_0_102">
+                        <button type="submit" class="_6j mvm _6wk _6wl _58mi _6o _6v"
+                                name="submitLog" id="u_0_rs">Log in
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
-
     </div>
+
 </div>
-
-
+>
 </body>
 
 <script>
@@ -283,7 +302,7 @@
     });
 
 
-   $("#form-registration").submit(function (e) {
+    $("#form-registration").submit(function (e) {
         var form = $(this).serialize();
         $.ajax({
             type: "POST",
@@ -294,18 +313,74 @@
                 debugger;
                 alert("User has registered success!");
                 window.location.href = 'testForRedirect.html';
-               // $(this).load('testForRedirect.html');
+                // $(this).load('testForRedirect.html');
             },
             error: function error() {
                 debugger;
-                alert( "The user with email or " +
+                alert("The user with email or " +
                     "phone is already registered in DB.");
                 window.location.href = 'testForRedirect.html';
-               // $(this).load('testForRedirect.html');
+                // $(this).load('testForRedirect.html');
+
+            }
+        });
+        e.preventDefault();
+    });
+    $("#form-login").submit(function (e) {
+        var form = $(this).serialize();
+        $.ajax({
+            type: "POST",
+            url: "/login",
+            data: form,
+
+            success: function success() {
+                debugger;
+                alert("User Log in ti Find Me");
+                window.location.href = 'profile';
+                // $(this).load('testForRedirect.html');
+            },
+            error: function error(e) {
+                debugger;
+                if(e.status === 404){
+                    alert("Wrong password or email. Try again please.");
+                    window.location.href = 'index';
+
+                } else if (e.status === 400) {
+                    alert("Please, register in FindMe");
+                    window.location.href = 'index';
+                }
+                else if (e.status === 403) {
+                    alert("Your account was blocked. Please, contact with administrator.");
+                }
+                // $(this).load('testForRedirect.html');
 
             }
         });
         e.preventDefault();
     })
+    /*$("#form-login").submit(function (e) {
+        var form = $(this).serialize();
+        $.ajax({
+            type: "POST",
+            url: "/login",
+            data: form,
+
+            success: function success() {
+                debugger;
+                alert("User Log in ti Find Me");
+                window.location.href = 'testForRedirect';
+                // $(this).load('testForRedirect.html');
+            },
+            error: function error() {
+                debugger;
+                alert("The user with email or " +
+                    "phone is already registered in DB.");
+                window.location.href = 'testForRedirect.html';
+                // $(this).load('testForRedirect.html');
+
+            }
+        });
+        e.preventDefault();
+    })*/
 </script>
 </html>

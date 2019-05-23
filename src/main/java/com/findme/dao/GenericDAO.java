@@ -11,5 +11,5 @@ public interface GenericDAO<T> {
 
     void delete(Long id) throws BadRequestException;
 
-    T update(T t);
+    T update(T t) throws BadRequestException;
 }

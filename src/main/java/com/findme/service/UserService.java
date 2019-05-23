@@ -42,8 +42,8 @@ public class UserService {
         userDAO.delete(id);
     }
 
-    public User update(User entity) throws BadRequestException, NotFoundException {
-        checkExistenceEntityInDB(entity.getId());
+    public User update(User entity) throws BadRequestException {
+       // checkExistenceEntityInDB(entity.getId());
         return userDAO.update(entity);
 
     }
@@ -52,5 +52,13 @@ public class UserService {
         User findEntity = findOne(id);
         if (findEntity == null) throw new NotFoundException(" with id " + id + "doesn't exist in DB");
         return true;
+    }
+
+    @Transactional
+    public User checkExistanceUserInDB(String email, String password) {
+        User findUser = userDAO.checkExistUsDB(email, password);
+        if(findUser == null)
+            return null;
+        return findUser;
     }
 }

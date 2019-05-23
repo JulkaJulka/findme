@@ -8,4 +8,5 @@ import java.util.List;
 @Repository
 public interface UserDAO extends GenericDAO<User>{
      List<User> findByPhoneOrEmail(User user);
+     User checkExistUsDB(String email, String password);
 }

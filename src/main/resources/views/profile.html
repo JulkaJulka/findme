@@ -3,6 +3,7 @@
 <head>
 
     <title>Find me</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
 <div>
@@ -46,8 +47,30 @@
     </div>
 </div>
 </div>
+<button id="test-ajax">Sign out</button>
 
 </body>
+<script>
+    $("#test-ajax").click(function () {
+    $.ajax({
+        type: "POST",
+        url: "/logout",
+        data: {},
+
+        success: function success() {
+            debugger;
+            alert("User log out success!");
+            window.location.href = 'index.html';
+            // $(this).load('testForRedirect.html');
+        },
+        error: function error(xhr) {
+            debugger;
+            alert("error!");
+        }
+    });
+    e.preventDefault();
+});
+    </script>
 <style>
     .left{
         float: left;
