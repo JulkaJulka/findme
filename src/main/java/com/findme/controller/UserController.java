@@ -82,33 +82,29 @@ public class UserController {
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<String> loginUser(HttpServletRequest request, HttpServletResponse response, @ModelAttribute User user) throws IOException, ServletException {
+    public ResponseEntity<String> loginUser(HttpServletRequest request, HttpServletResponse response)  {
         try {
             String email = request.getParameter("emailLog");
             String password = request.getParameter("passwordLog");
 
             HttpSession session = request.getSession();
+            session.setAttribute("email", email);
 
-            if (session != null) {
                 User userFound = userService.checkExistanceUserInDB(email, password);
 
                 if (userFound == null) {
-                    session.invalidate();
-                    return new ResponseEntity<>("Wrong password or email. Try again please.", HttpStatus.NOT_FOUND);
+                    return new ResponseEntity<>("Wrong password or email. Try again please.", HttpStatus.BAD_REQUEST);
 
                 } else if (userFound.getLoginStatus() == LoginStatus.SUSPEND) {
-                    return new ResponseEntity<>("Your account was blocked. Please, contact with administrator.", HttpStatus.FORBIDDEN);
+                    return new ResponseEntity<>("Your account was suspended. Please, contact with ...", HttpStatus.FORBIDDEN);
 
                 } else if(userFound.getLoginStatus() == LoginStatus.LOGOUT){
 
                 userFound.setLoginStatus(LoginStatus.LOGIN);
-                userService.update(userFound);}
+                userService.update(userFound);
+                    return new ResponseEntity<>("User successfully log in to FindMe", HttpStatus.OK);}
 
-                return new ResponseEntity<>("User successfully log in to FindMe", HttpStatus.OK);
-
-            } else {
-                return new ResponseEntity<>("Please, register in FindMe", HttpStatus.BAD_REQUEST);
-            }
+               return new ResponseEntity<>("User successfully log in to FindMe", HttpStatus.OK);
 
         } catch (BadRequestException e) {
             return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
@@ -120,14 +116,16 @@ public class UserController {
 
     @RequestMapping(path = "/logout", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpServletResponse response, @ModelAttribute User user) {
+    public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpServletResponse response, @ModelAttribute User user)  {
         try {
             HttpSession session = request.getSession();
-            session.setAttribute("user", user);
 
             user.setLoginStatus(LoginStatus.LOGOUT);
             userService.update(user);
+
+            session.removeAttribute("email");
             session.invalidate();
+
             return new ResponseEntity<>("User logout successfully", HttpStatus.OK);
 
         } catch (BadRequestException e) {

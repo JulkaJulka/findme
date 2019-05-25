@@ -335,22 +335,19 @@
 
             success: function success() {
                 debugger;
-                alert("User Log in ti Find Me");
+                alert("User Log in to Find Me successfully");
                 window.location.href = 'profile';
                 // $(this).load('testForRedirect.html');
             },
             error: function error(e) {
                 debugger;
-                if(e.status === 404){
+                if(e.status === 400){
                     alert("Wrong password or email. Try again please.");
                     window.location.href = 'index';
 
-                } else if (e.status === 400) {
-                    alert("Please, register in FindMe");
-                    window.location.href = 'index';
                 }
                 else if (e.status === 403) {
-                    alert("Your account was blocked. Please, contact with administrator.");
+                    alert("Your account was suspended. Please, contact with administrator.");
                 }
                 // $(this).load('testForRedirect.html');
 
