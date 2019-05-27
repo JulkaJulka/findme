@@ -95,9 +95,6 @@ public class UserController {
                 if (userFound == null) {
                     return new ResponseEntity<>("Wrong password or email. Try again please.", HttpStatus.BAD_REQUEST);
 
-                } else if (userFound.getLoginStatus() == LoginStatus.SUSPEND) {
-                    return new ResponseEntity<>("Your account was suspended. Please, contact with ...", HttpStatus.FORBIDDEN);
-
                 } else if(userFound.getLoginStatus() == LoginStatus.LOGOUT){
 
                 userFound.setLoginStatus(LoginStatus.LOGIN);
