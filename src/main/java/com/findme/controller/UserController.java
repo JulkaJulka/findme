@@ -95,12 +95,12 @@ public class UserController {
                 if (userFound == null) {
                     return new ResponseEntity<>("Wrong password or email. Try again please.", HttpStatus.BAD_REQUEST);
 
-                } else if(userFound.getLoginStatus() == LoginStatus.LOGOUT){
+                } else if(userFound.getLoginStatus() == LoginStatus.LOGOUT) {
 
-                userFound.setLoginStatus(LoginStatus.LOGIN);
-                userService.update(userFound);
-                    return new ResponseEntity<>("User successfully log in to FindMe", HttpStatus.OK);}
+                    userFound.setLoginStatus(LoginStatus.LOGIN);
+                    userService.update(userFound);
 
+                }
                return new ResponseEntity<>("User successfully log in to FindMe", HttpStatus.OK);
 
         } catch (BadRequestException e) {
