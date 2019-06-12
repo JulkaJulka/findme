@@ -82,51 +82,38 @@ public class UserController {
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<String> loginUser(HttpServletRequest request, HttpServletResponse response)  {
+    public ResponseEntity<String> loginUser(HttpServletRequest request, @RequestParam("emailLog") String email,
+                                            @RequestParam("passwordLog") String password) {
         try {
-            String email = request.getParameter("emailLog");
-            String password = request.getParameter("passwordLog");
 
             HttpSession session = request.getSession();
-            session.setAttribute("email", email);
 
-                User userFound = userService.checkExistanceUserInDB(email, password);
+            User userFound = userService.checkExistanceUserInDB(email, password);
 
-                if (userFound == null) {
-                    return new ResponseEntity<>("Wrong password or email. Try again please.", HttpStatus.BAD_REQUEST);
+            if (userFound == null) {
+                return new ResponseEntity<>("Wrong password or email. Try again please.", HttpStatus.BAD_REQUEST);
 
-                } else if(userFound.getLoginStatus() == LoginStatus.LOGOUT) {
+            } else {
+                session.setAttribute("email", email);
 
-                    userFound.setLoginStatus(LoginStatus.LOGIN);
-                    userService.update(userFound);
+                return new ResponseEntity<>("User successfully log in to FindMe", HttpStatus.OK);
+            }
 
-                }
-               return new ResponseEntity<>("User successfully log in to FindMe", HttpStatus.OK);
-
-        } catch (BadRequestException e) {
-            return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
         } catch (HttpServerErrorException.InternalServerError e) {
             return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-
     @RequestMapping(path = "/logout", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpServletResponse response, @ModelAttribute User user)  {
+    public ResponseEntity<String> logoutUser(HttpServletRequest request) {
         try {
             HttpSession session = request.getSession();
-
-            user.setLoginStatus(LoginStatus.LOGOUT);
-            userService.update(user);
 
             session.removeAttribute("email");
             session.invalidate();
 
             return new ResponseEntity<>("User logout successfully", HttpStatus.OK);
-
-        } catch (BadRequestException e) {
-            return new ResponseEntity<>("Badrequest", HttpStatus.BAD_REQUEST);
 
         } catch (HttpServerErrorException.InternalServerError e) {
             return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
