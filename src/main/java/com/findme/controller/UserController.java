@@ -111,7 +111,7 @@ public class UserController {
             HttpSession session = request.getSession();
 
             session.removeAttribute("email");
-            session.invalidate();
+
 
             return new ResponseEntity<>("User logout successfully", HttpStatus.OK);
 
