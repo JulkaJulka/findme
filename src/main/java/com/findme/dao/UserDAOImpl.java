@@ -42,12 +42,15 @@ public class UserDAOImpl extends GenericDAOImpl<User> implements UserDAO{
         Query query = getEntityManager().createQuery(FIND_USER_BY_EMAIL_PSWD);
         query.setParameter("email", email);
         query.setParameter("password", password);
-       // System.out.println(query.getResultList().toString());
+
         List results = query.getResultList();
+
         if (results.isEmpty())
             return null;
+
         else if (results.size() == 1)
             return (User)results.get(0);
+
         throw new NonUniqueResultException();
 
     }

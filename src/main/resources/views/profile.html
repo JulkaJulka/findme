@@ -16,10 +16,10 @@
     </div>
     <!--<div class="right">
         Styled text here-->
-       <!-- <p th:text="${text}"></p>-->
+    <!-- <p th:text="${text}"></p>-->
     <div class="bblock">
-    <p>First name:</p>
-    <p>Last name:</p>
+        <p>First name:</p>
+        <p>Last name:</p>
         <p>Phone:</p>
         <p>Country:</p>
         <p>City:</p>
@@ -32,7 +32,7 @@
         <p>University:</p>
     </div>
     <div class="bblock">
-          <p th:text="${user.firstName}"></p>
+        <p th:text="${user.firstName}"></p>
         <p th:text="${user.lastName}"></p>
         <p th:text="${user.phone}"></p>
         <p th:text="${user.country}"></p>
@@ -45,32 +45,81 @@
         <p th:text="${user.school}"></p>
         <p th:text="${user.university}"></p>
     </div>
-</div>
+    <div class="right">
+        <form id="form-addFriend" action="/addFriend">
+
+        <input path="id_friend" type="number"
+               class="inputtext _58mg _5dba _2ph-"
+                name="id_friend"
+               id="u_0_n"  placeholder="id friend" required>
+
+        <button class="btn" type="submit" name="addFriend">addFriend</button>
+
+        </form>
+
+
+    </div>
 </div>
 <button id="test-ajax">Sign out</button>
 
 </body>
 <script>
-    $("#test-ajax").click(function () {
-    $.ajax({
-        type: "POST",
-        url: "/logout",
-        data: {},
+    $("#form-addFriend").submit(function (e) {
+        var form = $(this).serialize();
+        $.ajax({
+            type: "POST",
+            url: "/addFriend",
+            data: form,
 
-        success: function success() {
-            debugger;
-            alert("User log out success!");
-            window.location.href = 'index.html';
-            // $(this).load('testForRedirect.html');
-        },
-        error: function error(xhr) {
-            debugger;
-            alert("error!");
-        }
+            success: function success() {
+                debugger;
+                alert("Request had sent successfully");
+                window.location.href = 'profile';
+                // $(this).load('testForRedirect.html');
+            },
+            error: function error(e) {
+                debugger;
+                if(e.status === 400){
+                    alert("Wrong friend's id. Try again.");
+                    window.location.href = 'index';
+
+                }
+                if(e.status === 401){
+                    alert("You have not permissions. Please, login to site");
+                    window.location.href = 'index';
+
+                }
+                if(e.status === 500){
+                    alert("Something went wrong.. .");
+                    window.location.href = 'index';
+
+                }
+                // $(this).load('testForRedirect.html');
+
+            }
+        });
+        e.preventDefault();
+    })
+    $("#test-ajax").click(function () {
+        $.ajax({
+            type: "POST",
+            url: "/logout",
+            data: {},
+
+            success: function success() {
+                debugger;
+                alert("User log out success!");
+                window.location.href = 'index.html';
+                // $(this).load('testForRedirect.html');
+            },
+            error: function error(xhr) {
+                debugger;
+                alert("error!");
+            }
+        });
+        e.preventDefault();
     });
-    e.preventDefault();
-});
-    </script>
+</script>
 <style>
     .left{
         float: left;

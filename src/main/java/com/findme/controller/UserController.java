@@ -7,6 +7,7 @@ import com.findme.NotFoundException;
 import com.findme.dao.UserDAOImpl;
 import com.findme.model.LoginStatus;
 import com.findme.model.User;
+import com.findme.service.RelationShipFrndsSErvice;
 import com.findme.service.UserService;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
@@ -30,10 +31,13 @@ import java.util.Date;
 @EnableWebMvc
 public class UserController {
     private UserService userService;
-    private UserDAOImpl userDAO;
+    private RelationShipFrndsSErvice relationShipFrndsSErvice;
+    // private UserDAOImpl userDAO;
 
-    public UserController(UserService userService) {
+
+    public UserController(UserService userService, RelationShipFrndsSErvice relationShipFrndsSErvice) {
         this.userService = userService;
+        this.relationShipFrndsSErvice = relationShipFrndsSErvice;
     }
 
     @RequestMapping(path = "/user/{userId}", method = RequestMethod.GET)
@@ -95,10 +99,39 @@ public class UserController {
 
             } else {
                 session.setAttribute("email", email);
+                session.setAttribute("id", userFound.getId());
 
                 return new ResponseEntity<>("User successfully log in to FindMe", HttpStatus.OK);
             }
 
+        } catch (HttpServerErrorException.InternalServerError e) {
+            return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(path = "/addFriend", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<String> addRelationship(HttpServletRequest request, @RequestParam("id_friend") String userIdTo) {
+        try {
+            Long userIdToL = Long.parseLong(userIdTo);
+
+            HttpSession session = request.getSession();
+            session.getAttribute("id");
+
+            Long userIdFrom = (Long) session.getAttribute("id");
+
+            if (userIdFrom == null)
+                return new ResponseEntity<>("You have to login", HttpStatus.UNAUTHORIZED);
+
+            relationShipFrndsSErvice.addRelationship(userIdFrom, userIdToL);
+            return new ResponseEntity<>("Request sent successfully", HttpStatus.OK);
+
+
+        } catch (NumberFormatException e) {
+            return new ResponseEntity<>("Wrong friend's id. Try again.", HttpStatus.BAD_REQUEST);
+
+        } catch (BadRequestException e) {
+            return new ResponseEntity<>("You can not add myself.", HttpStatus.BAD_REQUEST);
         } catch (HttpServerErrorException.InternalServerError e) {
             return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -111,6 +144,7 @@ public class UserController {
             HttpSession session = request.getSession();
 
             session.removeAttribute("email");
+            session.removeAttribute("id");
 
 
             return new ResponseEntity<>("User logout successfully", HttpStatus.OK);
@@ -119,6 +153,7 @@ public class UserController {
             return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @RequestMapping(path = "/user", method = RequestMethod.GET)
     public String profile1(Model model, @PathVariable String userId) {
