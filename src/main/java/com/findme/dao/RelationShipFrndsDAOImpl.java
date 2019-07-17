@@ -1,5 +1,6 @@
 package com.findme.dao;
 
+import com.findme.model.RelationShip;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.RelationShipFrnds;
 import org.springframework.stereotype.Repository;
@@ -15,7 +16,9 @@ import java.util.List;
 public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> implements RelationShipDAO {
 
     private static String FIND_RELATION_BY_ID = "FROM RelationShipFrnds WHERE userFrom = :idFrom AND userTo = :idTo";
-    private static String INSERT_RELATION = "INSERT INTO  RelationShipFrnds(USER_FROM, USER_TO, STATUS) VALUES(?,?,?)";
+    private static String FIND_RELATION_BY_ID_ANSW = "SELECT r.userFrom FROM RelationShipFrnds r WHERE  r.userTo = :idAnsw AND r.status = :status";
+    private static String FIND_OUTCOME_BY_ID = "SELECT r.userTo FROM RelationShipFrnds r WHERE  r.userFrom = :idAnsw AND r.status = :status";
+   // private static String FIND_RELATION_BY_ID_ANSW = "FROM RelationShipFrnds WHERE  userTo = :idAnsw AND status = :status";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -40,6 +43,62 @@ public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> 
         }
     }
 
+    @Override
+    public void answerToRequestFriend(Long idReq, Long idAnsw) {
+
+    }
+
+    @Override
+    public List<RelationShipFrnds> findRelsByIdAnsw(Long idAnsw) {
+        Query query = getEntityManager().createQuery(FIND_RELATION_BY_ID_ANSW);
+        query.setParameter("idAnsw", idAnsw);
+        query.setParameter("status", RelationShipFriends.REQUEST_SEND);
+
+        List results = query.getResultList();
+
+        if (results.isEmpty())
+            return null;
+
+       return results;
+
+    }
+
+    @Override
+    public List<Long> getIncomeRequests(String userId) {
+        Long userIdL = Long.parseLong(userId);
+        Query query = getEntityManager().createQuery(FIND_RELATION_BY_ID_ANSW);
+        query.setParameter("idAnsw", userIdL);
+        query.setParameter("status", RelationShipFriends.REQUEST_SEND);
+
+        List results = query.getResultList();
+
+        if (results.isEmpty())
+            return null;
+
+        return results;
+    }
+
+    @Override
+    public List<Long> getOutcomeRequests(String userId) {
+        Long userIdL = Long.parseLong(userId);
+        Query query = getEntityManager().createQuery(FIND_OUTCOME_BY_ID);
+        query.setParameter("idAnsw", userIdL);
+        query.setParameter("status", RelationShipFriends.REQUEST_SEND);
+
+        List results = query.getResultList();
+
+        if (results.isEmpty())
+            return null;
+
+        return results;
+    }
+
+    @Override
+    public RelationShipFrnds updateRelationship(Long userIdFrom, Long userIdTo, RelationShipFriends status) {
+        RelationShipFrnds findRelFrnds = findRelByFromTo(userIdFrom, userIdTo);
+        findRelFrnds.setStatus(status);
+        return findRelFrnds;
+    }
 
     public RelationShipFrnds findRelByFromTo(Long userFrom, Long userTo) {
         Query query = getEntityManager().createQuery(FIND_RELATION_BY_ID);

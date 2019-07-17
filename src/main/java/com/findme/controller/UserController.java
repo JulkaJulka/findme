@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.findme.BadRequestException;
 import com.findme.InternalServerException;
 import com.findme.NotFoundException;
+import com.findme.dao.RelationShipFrndsDAOImpl;
 import com.findme.dao.UserDAOImpl;
 import com.findme.model.LoginStatus;
+import com.findme.model.RelationShipFriends;
+import com.findme.model.RelationShipFrnds;
 import com.findme.model.User;
 import com.findme.service.RelationShipFrndsSErvice;
 import com.findme.service.UserService;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.servlet.ServletException;
@@ -25,19 +29,28 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Controller
 @EnableWebMvc
 public class UserController {
     private UserService userService;
     private RelationShipFrndsSErvice relationShipFrndsSErvice;
+    private RelationShipFrndsDAOImpl relationShipFrndsDAO;
     // private UserDAOImpl userDAO;
 
 
-    public UserController(UserService userService, RelationShipFrndsSErvice relationShipFrndsSErvice) {
+    /*public UserController(UserService userService, RelationShipFrndsSErvice relationShipFrndsSErvice) {
         this.userService = userService;
         this.relationShipFrndsSErvice = relationShipFrndsSErvice;
+    }*/
+
+    public UserController(UserService userService, RelationShipFrndsSErvice relationShipFrndsSErvice, RelationShipFrndsDAOImpl relationShipFrndsDAO) {
+        this.userService = userService;
+        this.relationShipFrndsSErvice = relationShipFrndsSErvice;
+        this.relationShipFrndsDAO = relationShipFrndsDAO;
     }
 
     @RequestMapping(path = "/user/{userId}", method = RequestMethod.GET)
@@ -135,6 +148,56 @@ public class UserController {
         } catch (HttpServerErrorException.InternalServerError e) {
             return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @RequestMapping(value = "/user/reqflist", method = RequestMethod.GET)
+    @ResponseBody
+    public ModelAndView getIncomeRequests(HttpSession session) {
+
+        ModelAndView model = new ModelAndView("badRequestExcp");
+
+        if (session.getAttribute("id") == null) {
+
+            return model;
+        }
+
+        Long id = (Long) session.getAttribute("id");
+        List<Long> list = relationShipFrndsSErvice.getIncomeRequests(id.toString());
+
+        model.setViewName("reqflist");
+        model.addObject("lists", list);
+
+        return model;
+    }
+
+    public RelationShipFrnds updateRelationShip(String userIdFrom, String userIdTo, RelationShipFriends status){
+        return relationShipFrndsSErvice.updateRelationship(Long.parseLong(userIdFrom),Long.parseLong(userIdTo), status);
+    }
+
+    @RequestMapping(value = "/user/outflist", method = RequestMethod.GET)
+    @ResponseBody
+    public ModelAndView getOutcomeRequests(HttpSession session) {
+
+        ModelAndView model = new ModelAndView("badRequestExcp");
+
+        if (session.getAttribute("id") == null) {
+
+            return model;
+        }
+
+        Long id = (Long) session.getAttribute("id");
+        List<Long> list = relationShipFrndsSErvice.getOutcomeRequests(id.toString());
+
+        model.setViewName("outflist");
+        model.addObject("lists", list);
+
+        return model;
+    }
+
+
+    @RequestMapping(path = "/index", method = RequestMethod.GET)
+    public String getIndex() {
+        return "index";
     }
 
     @RequestMapping(path = "/logout", method = RequestMethod.GET)

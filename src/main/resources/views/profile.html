@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
-<head>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:c="http://www.w3.org/1999/XSL/Transform">
+<head>
     <title>Find me</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
@@ -46,17 +47,23 @@
         <p th:text="${user.university}"></p>
     </div>
     <div class="right">
-        <form id="form-addFriend" action="/addFriend">
+        <div>
+            <form id="form-addFriend" action="/addFriend">
 
-        <input path="id_friend" type="number"
-               class="inputtext _58mg _5dba _2ph-"
-                name="id_friend"
-               id="u_0_n"  placeholder="id friend" required>
+                <input path="id_friend" type="number"
+                       class="inputtext _58mg _5dba _2ph-"
+                       name="id_friend"
+                       id="u_0_n"  placeholder="id friend" required>
 
-        <button class="btn" type="submit" name="addFriend">addFriend</button>
+                <button class="btn" type="submit" name="addFriend">addFriend</button>
 
-        </form>
-
+            </form>
+        </div>
+        <div>
+           <!--<button id="getRequest" class="btn" type="submit" name="getRequest" href="/user/reqflist">Requests to add to friends </button>-->
+            <button onclick="window.location='/user/reqflist'">Requests to add to friends </button>
+            <button onclick="window.location='/user/outflist'">Your Outcome requests to add Friends  </button>
+        </div>
 
     </div>
 </div>
@@ -64,6 +71,54 @@
 
 </body>
 <script>
+   /* $('#getRequest').click(function () {
+
+        $.getJSON('GetCities', function (data) {
+
+            $("ul#output > li").remove();
+
+            $.each(data, function (key, value) {
+                $("#output").append('<li>' + value['name'] + " " + value['population'] + '</li>');
+            });
+        });
+    });*/
+
+   /*$.ajax({
+       url: "/user/reqfliest",
+       type: 'GET',
+       success: function(response) {
+           var requestList = response.data;
+           console.log(requestList);
+       }
+   });*/
+  /* function getReqFriens(callback) {
+       var url = "/user/regflist";
+       $.ajax({
+           type: 'GET',
+           url: url,
+           success: function (data) {
+               //data will be the response from the server (the api's)
+               // If it's not already in a list (array) then you have to build it up
+               //Example:
+               var array = [];
+               for (var i = 0; i < data.requestlist.length; i++) {
+                   array.push(data[i]);
+               }
+               callback(array);
+           },
+           error: function (err) {
+               alert('error!');
+               console.log(err); //prints error object to console
+           }
+
+       });
+   }
+
+   function getsCalledWhenFinished(apiArray) {
+       //do whatever you want with the data..
+   }
+
+   getAPIArray(getsCalledWhenFinished);*/
     $("#form-addFriend").submit(function (e) {
         var form = $(this).serialize();
         $.ajax({

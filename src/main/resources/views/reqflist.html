@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:c="http://java.sun.com/jstl/core" xmlns:th="http://www.w3.org/1999/xhtml"
+>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>friends to add</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+
+<h2>Respond to Your Friend Requests: </h2>
+
+<c:if test="${not empty lists}">
+
+    <ul>
+        <c:forEach items="${lists}" var="i" >
+            <li><c:out value="${i}" /></li><br />
+        </c:forEach>
+    </ul>
+
+</c:if>
+
+</body>
+<!--<script>
+    $.ajax({
+        url: "/user/reqflist",
+        type: 'GET',
+        success: function(response) {
+            var requestList = response.data;
+            console.log(requestList);
+        }
+    });
+
+    </script>-->
+</html>
