@@ -2,17 +2,13 @@ package com.findme.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.findme.BadRequestException;
-import com.findme.InternalServerException;
 import com.findme.NotFoundException;
 import com.findme.dao.RelationShipFrndsDAOImpl;
-import com.findme.dao.UserDAOImpl;
-import com.findme.model.LoginStatus;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.RelationShipFrnds;
 import com.findme.model.User;
-import com.findme.service.RelationShipFrndsSErvice;
+import com.findme.service.RelationshipService;
 import com.findme.service.UserService;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,14 +18,10 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -37,7 +29,7 @@ import java.util.List;
 @EnableWebMvc
 public class UserController {
     private UserService userService;
-    private RelationShipFrndsSErvice relationShipFrndsSErvice;
+    private RelationshipService relationshipService;
     private RelationShipFrndsDAOImpl relationShipFrndsDAO;
     // private UserDAOImpl userDAO;
 
@@ -47,9 +39,9 @@ public class UserController {
         this.relationShipFrndsSErvice = relationShipFrndsSErvice;
     }*/
 
-    public UserController(UserService userService, RelationShipFrndsSErvice relationShipFrndsSErvice, RelationShipFrndsDAOImpl relationShipFrndsDAO) {
+    public UserController(UserService userService, RelationshipService relationshipService, RelationShipFrndsDAOImpl relationShipFrndsDAO) {
         this.userService = userService;
-        this.relationShipFrndsSErvice = relationShipFrndsSErvice;
+        this.relationshipService = relationshipService;
         this.relationShipFrndsDAO = relationShipFrndsDAO;
     }
 
@@ -136,7 +128,7 @@ public class UserController {
             if (userIdFrom == null)
                 return new ResponseEntity<>("You have to login", HttpStatus.UNAUTHORIZED);
 
-            relationShipFrndsSErvice.addRelationship(userIdFrom, userIdToL);
+            relationshipService.addRelationship(userIdFrom, userIdToL);
             return new ResponseEntity<>("Request sent successfully", HttpStatus.OK);
 
 
@@ -150,9 +142,12 @@ public class UserController {
         }
     }
 
+
     @RequestMapping(value = "/user/reqflist", method = RequestMethod.GET)
     @ResponseBody
-    public ModelAndView getIncomeRequests(HttpSession session) {
+    public ModelAndView getIncomeRequests(HttpSession session)throws BadRequestException {
+
+       relationshipService.addRelationship(120L, 114L);
 
         ModelAndView model = new ModelAndView("badRequestExcp");
 
@@ -162,7 +157,7 @@ public class UserController {
         }
 
         Long id = (Long) session.getAttribute("id");
-        List<Long> list = relationShipFrndsSErvice.getIncomeRequests(id.toString());
+        List<Long> list = relationshipService.getIncomeRequests(id.toString());
 
         model.setViewName("reqflist");
         model.addObject("lists", list);
@@ -171,7 +166,7 @@ public class UserController {
     }
 
     public RelationShipFrnds updateRelationShip(String userIdFrom, String userIdTo, RelationShipFriends status){
-        return relationShipFrndsSErvice.updateRelationship(Long.parseLong(userIdFrom),Long.parseLong(userIdTo), status);
+        return relationshipService.updateRelationship(Long.parseLong(userIdFrom),Long.parseLong(userIdTo), status);
     }
 
     @RequestMapping(value = "/user/outflist", method = RequestMethod.GET)
@@ -186,7 +181,7 @@ public class UserController {
         }
 
         Long id = (Long) session.getAttribute("id");
-        List<Long> list = relationShipFrndsSErvice.getOutcomeRequests(id.toString());
+        List<Long> list = relationshipService.getOutcomeRequests(id.toString());
 
         model.setViewName("outflist");
         model.addObject("lists", list);

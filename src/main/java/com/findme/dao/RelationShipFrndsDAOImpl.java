@@ -1,6 +1,5 @@
 package com.findme.dao;
 
-import com.findme.model.RelationShip;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.RelationShipFrnds;
 import org.springframework.stereotype.Repository;
@@ -15,15 +14,15 @@ import java.util.List;
 @Repository
 public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> implements RelationShipDAO {
 
-    private static String FIND_RELATION_BY_ID = "FROM RelationShipFrnds WHERE userFrom = :idFrom AND userTo = :idTo";
-    private static String FIND_RELATION_BY_ID_ANSW = "SELECT r.userFrom FROM RelationShipFrnds r WHERE  r.userTo = :idAnsw AND r.status = :status";
-    private static String FIND_OUTCOME_BY_ID = "SELECT r.userTo FROM RelationShipFrnds r WHERE  r.userFrom = :idAnsw AND r.status = :status";
+    private static String FIND_RELATION_BY_ID = "from RelationShipFrnds WHERE USER_FROM = :idFrom AND USER_TO = :idTo ";
+    private static String FIND_RELATION_BY_ID_ANSW = "SELECT r.userFrom FROM RelationShipFrnds r WHERE  r.userTo = :idAnsw AND r.status = :status ";
+    private static String FIND_OUTCOME_BY_ID = "SELECT r.userTo FROM RelationShipFrnds r WHERE  r.userFrom = :idAnsw AND r.status = :status ";
    // private static String FIND_RELATION_BY_ID_ANSW = "FROM RelationShipFrnds WHERE  userTo = :idAnsw AND status = :status";
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Transactional
+    /*@Transactional
     public void addRelationship(Long userIdFrom, Long userIdTo) {
         RelationShipFrnds findRelFrnds = findRelByFromTo(userIdFrom, userIdTo);
 
@@ -32,16 +31,16 @@ public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> 
          RelationShipFrnds relationShipNewFrnds = new RelationShipFrnds();
          relationShipNewFrnds.setUserFrom(userIdFrom);
          relationShipNewFrnds.setUserTo(userIdTo);
-         relationShipNewFrnds.setStatus(RelationShipFriends.REQUEST_SEND);
+         relationShipNewFrnds.setStatus(RelationShipFriends.PENDING);
 
          save(relationShipNewFrnds);
 
         } else {
 
-            findRelFrnds.setStatus(RelationShipFriends.REQUEST_SEND);
+            findRelFrnds.setStatus(RelationShipFriends.PENDING);
             update(findRelFrnds);
         }
-    }
+    }*/
 
     @Override
     public void answerToRequestFriend(Long idReq, Long idAnsw) {
@@ -52,7 +51,7 @@ public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> 
     public List<RelationShipFrnds> findRelsByIdAnsw(Long idAnsw) {
         Query query = getEntityManager().createQuery(FIND_RELATION_BY_ID_ANSW);
         query.setParameter("idAnsw", idAnsw);
-        query.setParameter("status", RelationShipFriends.REQUEST_SEND);
+        query.setParameter("status", RelationShipFriends.PENDING);
 
         List results = query.getResultList();
 
@@ -68,7 +67,7 @@ public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> 
         Long userIdL = Long.parseLong(userId);
         Query query = getEntityManager().createQuery(FIND_RELATION_BY_ID_ANSW);
         query.setParameter("idAnsw", userIdL);
-        query.setParameter("status", RelationShipFriends.REQUEST_SEND);
+        query.setParameter("status", RelationShipFriends.PENDING);
 
         List results = query.getResultList();
 
@@ -83,7 +82,7 @@ public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> 
         Long userIdL = Long.parseLong(userId);
         Query query = getEntityManager().createQuery(FIND_OUTCOME_BY_ID);
         query.setParameter("idAnsw", userIdL);
-        query.setParameter("status", RelationShipFriends.REQUEST_SEND);
+        query.setParameter("status", RelationShipFriends.PENDING);
 
         List results = query.getResultList();
 
@@ -93,11 +92,17 @@ public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> 
         return results;
     }
 
-    @Override
-    public RelationShipFrnds updateRelationship(Long userIdFrom, Long userIdTo, RelationShipFriends status) {
+    /*@Override
+    public RelationShipFrnds responseToRequest(Long userIdFrom, Long userIdTo, RelationShipFriends status) {
         RelationShipFrnds findRelFrnds = findRelByFromTo(userIdFrom, userIdTo);
         findRelFrnds.setStatus(status);
         return findRelFrnds;
+    }*/
+
+    public RelationShipFrnds updateRelationship(Long userIdFrom, Long userIdTo, RelationShipFriends status) {
+        RelationShipFrnds findRelFrnds = findRelByFromTo(userIdFrom, userIdTo);
+        findRelFrnds.setStatus(status);
+        return update(findRelFrnds);
     }
 
     public RelationShipFrnds findRelByFromTo(Long userFrom, Long userTo) {

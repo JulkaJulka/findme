@@ -1,11 +1,13 @@
 package com.findme.model;
 
+import com.findme.model.RelationShipFriends;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "RELATIONSHIP")
 public class RelationShipFrnds {
-    private Long id_relation;
+    private Long idRelation;
 
     private Long userFrom;
     private Long userTo;
@@ -14,11 +16,14 @@ public class RelationShipFrnds {
     public RelationShipFrnds() {
     }
 
+
+
     @Id
     @SequenceGenerator(name = "SEQ_REL_STATUS", allocationSize = 1, sequenceName = "SEQ_REL_STATUS")
     @GeneratedValue(generator = "SEQ_REL_STATUS", strategy = GenerationType.SEQUENCE)
-    public Long getId_relation() {
-        return id_relation;
+    @Column(name = "ID_RELATION")
+    public Long getIdRelation() {
+        return idRelation;
     }
 
     @Column(name = "USER_FROM")
@@ -37,8 +42,8 @@ public class RelationShipFrnds {
         return status;
     }
 
-    public void setId_relation(Long id_relation) {
-        this.id_relation = id_relation;
+    public void setIdRelation(Long idRelation) {
+        this.idRelation = idRelation;
     }
 
     public void setUserFrom(Long userFrom) {
@@ -53,12 +58,14 @@ public class RelationShipFrnds {
         this.status = status;
     }
 
+
     @Override
     public String toString() {
         return "RelationShipFrnds{" +
-                "id_relation=" + id_relation +
+                "idRelation=" + idRelation +
                 ", userFrom=" + userFrom +
                 ", userTo=" + userTo +
+                ", status=" + status +
                 '}';
     }
 }
