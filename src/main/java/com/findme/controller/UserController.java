@@ -147,7 +147,7 @@ public class UserController {
     @ResponseBody
     public ModelAndView getIncomeRequests(HttpSession session)throws BadRequestException {
 
-       relationshipService.addRelationship(120L, 114L);
+
 
         ModelAndView model = new ModelAndView("badRequestExcp");
 
