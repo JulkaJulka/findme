@@ -48,14 +48,36 @@
     </div>
     <div class="right">
         <div>
-            <form id="form-addFriend" action="/addFriend">
+            <form id="form-addRelationship" action="/addFriend">
 
-                <input path="id_friend" type="number"
+                <input path="id_friend"
                        class="inputtext _58mg _5dba _2ph-"
                        name="id_friend"
-                       id="u_0_n"  placeholder="id friend" required>
+                       id="u_0_n"  placeholder="id friend" >
 
-                <button class="btn" type="submit" name="addFriend">addFriend</button>
+                <button class="btn" type="submit" name="addRelationship">addRelationship</button>
+
+            </form>
+        </div>
+        <div>
+            <form id="form-updateRelationship" action="/updateRelationship">
+
+                <input path="userIdFrom"
+                       class="inputtext _58mg _5dba _2ph-"
+                       name="userIdFrom"
+                       id="u_0_f"  placeholder="id friendFromUpdate" required>
+
+                <input path="userIdTo"
+                       class="inputtext _58mg _5dba _2ph-"
+                       name="userIdTo"
+                       id="u_0_u"  placeholder="id friendUpdate" required>
+
+                <input path="status"
+                       class="inputtext _58mg _5dba _2ph-"
+                       name="status"
+                       id="u_0_s"  placeholder="status" required>
+
+                <button class="btn" type="submit" name="updateRelationship">updateRelationship</button>
 
             </form>
         </div>
@@ -119,31 +141,31 @@
    }
 
    getAPIArray(getsCalledWhenFinished);*/
-    $("#form-addFriend").submit(function (e) {
+    $("#form-addRelationship").submit(function (e) {
         var form = $(this).serialize();
         $.ajax({
             type: "POST",
-            url: "/addFriend",
+            url: "/addRelationship",
             data: form,
 
             success: function success() {
-                debugger;
+
                 alert("Request had sent successfully");
                 window.location.href = 'profile';
                 // $(this).load('testForRedirect.html');
             },
             error: function error(e) {
-                debugger;
-                if(e.status === 400){
-                    alert("Wrong friend's id. Try again.");
-                    window.location.href = 'index';
-
-                }
                 if(e.status === 401){
                     alert("You have not permissions. Please, login to site");
                     window.location.href = 'index';
 
                 }
+                if(e.status === 400){
+                    alert("Wrong friend's id. Try again.");
+                    window.location.href = 'index';
+
+                }
+
                 if(e.status === 500){
                     alert("Something went wrong.. .");
                     window.location.href = 'index';
@@ -155,6 +177,47 @@
         });
         e.preventDefault();
     })
+
+   $("#form-updateRelationship").submit(function (e) {
+       var form = $(this).serialize();
+       $.ajax({
+           type: "POST",
+           url: "/updateRelationship",
+           data: form,
+
+           success: function success() {
+               debugger;
+               alert("Update is  successfully");
+               window.location.href = 'profile';
+               // $(this).load('testForRedirect.html');
+           },
+           error: function error(e) {
+
+               if(e.status === 400){
+                   alert("Wrong friend's id. Try again.");
+                   window.location.href = 'index';
+
+               }
+
+               if(e.status === 401){
+                   alert("You have not permissions. Please, login to site");
+                   window.location.href = 'index';
+
+               }
+
+               if(e.status === 500){
+                   alert("Something went wrong.. .");
+                   window.location.href = 'index';
+
+               }
+               // $(this).load('testForRedirect.html');
+
+           }
+       });
+       e.preventDefault();
+   })
+
+
     $("#test-ajax").click(function () {
         $.ajax({
             type: "POST",

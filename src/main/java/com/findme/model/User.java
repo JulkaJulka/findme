@@ -138,11 +138,11 @@ public class User {
         return university;
     }
 
-    @Enumerated(EnumType.STRING)
+   /* @Enumerated(EnumType.STRING)
    @Column(name = "LOGIN_STATUS")
     public LoginStatus getLoginStatus() {
         return loginStatus;
-    }
+    }*/
 
     @JsonIgnore
     @OneToMany(targetEntity = Message.class, fetch = FetchType.LAZY, mappedBy = "userFrom",cascade = CascadeType.ALL)
@@ -200,9 +200,9 @@ public class User {
         this.lastDateActivited = lastDateActivited;
     }
 
-    public void setLoginStatus(LoginStatus loginStatus) {
+    /*public void setLoginStatus(LoginStatus loginStatus) {
         this.loginStatus = loginStatus;
-    }
+    }*/
 
    /*public void setRelationshipStatus(String relationshipStatus) {
         this.relationshipStatus = relationshipStatus;

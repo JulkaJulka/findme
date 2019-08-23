@@ -103,8 +103,7 @@ public class UserController {
                 return new ResponseEntity<>("Wrong password or email. Try again please.", HttpStatus.BAD_REQUEST);
 
             } else {
-                session.setAttribute("email", email);
-                session.setAttribute("id", userFound.getId());
+                session.setAttribute("user", userFound);
 
                 return new ResponseEntity<>("User successfully log in to FindMe", HttpStatus.OK);
             }
@@ -114,21 +113,21 @@ public class UserController {
         }
     }
 
-    @RequestMapping(path = "/addFriend", method = RequestMethod.POST)
+    @RequestMapping(path = "/addRelationship", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<String> addRelationship(HttpServletRequest request, @RequestParam("id_friend") String userIdTo) {
         try {
             Long userIdToL = Long.parseLong(userIdTo);
 
             HttpSession session = request.getSession();
-            session.getAttribute("id");
+            // session.getAttribute("id");
 
-            Long userIdFrom = (Long) session.getAttribute("id");
+            User userFrom = (User) session.getAttribute("user");
 
-            if (userIdFrom == null)
+            if (userFrom == null)
                 return new ResponseEntity<>("You have to login", HttpStatus.UNAUTHORIZED);
 
-            relationshipService.addRelationship(userIdFrom, userIdToL);
+            relationshipService.addRelationship(userFrom.getId(), userIdToL);
             return new ResponseEntity<>("Request sent successfully", HttpStatus.OK);
 
 
@@ -136,6 +135,7 @@ public class UserController {
             return new ResponseEntity<>("Wrong friend's id. Try again.", HttpStatus.BAD_REQUEST);
 
         } catch (BadRequestException e) {
+
             return new ResponseEntity<>("You can not add myself.", HttpStatus.BAD_REQUEST);
         } catch (HttpServerErrorException.InternalServerError e) {
             return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -143,10 +143,40 @@ public class UserController {
     }
 
 
+    @RequestMapping(path = "/updateRelationship", method = RequestMethod.POST)
+    public ResponseEntity<String> updateRelationship(HttpServletRequest request, @RequestParam("userIdFrom") String userIdFrom, @RequestParam("userIdTo") String userIdTo, @RequestParam("status") String status) {
+        try {
+            Long userIdToL = Long.parseLong(userIdTo);
+            Long userIdFromL = Long.parseLong(userIdTo);
+
+            HttpSession session = request.getSession();
+
+            User userFrom = (User) session.getAttribute("user");
+
+            if (userFrom == null)
+                return new ResponseEntity<>("You have to login", HttpStatus.UNAUTHORIZED);
+
+            if (userFrom.getId() == userIdToL) {
+                relationshipService.updateRelationshipStatusToRequest(Long.parseLong(userIdFrom), userIdToL, RelationShipFriends.valueOf(status));
+
+            } else {
+
+                relationshipService.updateRelationshipStatus(userFrom.getId(), userIdToL, RelationShipFriends.valueOf(status));
+            }
+            return new ResponseEntity<>("Update status sent successfully", HttpStatus.OK);
+
+        } catch (NumberFormatException e) {
+            return new ResponseEntity<>("Wrong friend's id. Try again.", HttpStatus.BAD_REQUEST);
+        } catch (BadRequestException e) {
+            return new ResponseEntity<>("You can not add myself.", HttpStatus.BAD_REQUEST);
+        } catch (HttpServerErrorException.InternalServerError e) {
+            return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @RequestMapping(value = "/user/reqflist", method = RequestMethod.GET)
     @ResponseBody
-    public ModelAndView getIncomeRequests(HttpSession session)throws BadRequestException {
-
+    public ModelAndView getIncomeRequests(HttpSession session) throws BadRequestException {
 
 
         ModelAndView model = new ModelAndView("badRequestExcp");
@@ -165,9 +195,9 @@ public class UserController {
         return model;
     }
 
-    public RelationShipFrnds updateRelationShip(String userIdFrom, String userIdTo, RelationShipFriends status){
-        return relationshipService.updateRelationship(Long.parseLong(userIdFrom),Long.parseLong(userIdTo), status);
-    }
+    //  public RelationShipFrnds updateRelationShip(String userIdFrom, String userIdTo, RelationShipFriends status) {
+    //   return relationshipService.updateRelationship(Long.parseLong(userIdFrom), Long.parseLong(userIdTo), status);
+    // }
 
     @RequestMapping(value = "/user/outflist", method = RequestMethod.GET)
     @ResponseBody

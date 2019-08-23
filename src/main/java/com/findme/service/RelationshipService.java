@@ -1,9 +1,13 @@
 package com.findme.service;
 
 import com.findme.BadRequestException;
+import com.findme.NotFoundException;
 import com.findme.dao.RelationShipFrndsDAOImpl;
+import com.findme.dao.UserDAOImpl;
+import com.findme.model.RelationShip;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.RelationShipFrnds;
+import com.findme.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,14 +19,26 @@ public class RelationshipService {
 
     @Autowired
     private RelationShipFrndsDAOImpl relationShipDAOImpl;
+    @Autowired
+    private UserDAOImpl userDAO;
 
-    @Transactional
+    /*@Transactional
     public void addRelationship(Long userIdFrom, Long userIdTo) throws BadRequestException {
 
         if (userIdFrom == userIdTo)
             throw new BadRequestException("You can not add myself");
 
-        RelationShipFrnds relationShipFind = relationShipDAOImpl.findRelByFromTo(userIdTo, userIdFrom);
+        RelationShipFrnds relationShipFind = relationShipDAOImpl.findRelByFromTo(userIdFrom, userIdTo);
+
+        if (relationShipFind == null) {
+
+            RelationShipFrnds relationShipFrnds = new RelationShipFrnds();
+            relationShipFrnds.setUserFrom(userIdFrom);
+            relationShipFrnds.setUserTo(userIdTo);
+            relationShipFrnds.setStatus(RelationShipFriends.PENDING);
+
+            relationShipDAOImpl.save(relationShipFrnds);
+        }
 
         if (relationShipFind != null) {
 
@@ -37,31 +53,51 @@ public class RelationshipService {
             relationShipFind.setStatus(RelationShipFriends.PENDING);
 
             relationShipDAOImpl.update(relationShipFind);
-        } else{
-
-        relationShipFind = relationShipDAOImpl.findRelByFromTo(userIdFrom, userIdTo);
-
-        if (relationShipFind != null) {
-
-            if (relationShipFind.getStatus() == RelationShipFriends.PENDING)
-                throw new BadRequestException(userIdTo + " must accept your request that you had sent early");
-
-            if (relationShipFind.getStatus() == RelationShipFriends.ACCEPT)
-                throw new BadRequestException("You have been already friends with " + userIdTo);
-
-            relationShipFind.setStatus(RelationShipFriends.PENDING);
-
-            relationShipDAOImpl.update(relationShipFind);
-
         } else {
 
+            relationShipFind = relationShipDAOImpl.findRelByFromTo(userIdFrom, userIdTo);
+
+            if (relationShipFind != null) {
+
+                if (relationShipFind.getStatus() == RelationShipFriends.PENDING)
+                    throw new BadRequestException(userIdTo + " must accept your request that you had sent early");
+
+                if (relationShipFind.getStatus() == RelationShipFriends.ACCEPT)
+                    throw new BadRequestException("You have been already friends with " + userIdTo);
+
+                relationShipFind.setStatus(RelationShipFriends.PENDING);
+
+                relationShipDAOImpl.update(relationShipFind);
+
+            } else {
+
+                RelationShipFrnds relationShipFrnds = new RelationShipFrnds();
+                relationShipFrnds.setUserFrom(userIdFrom);
+                relationShipFrnds.setUserTo(userIdTo);
+                relationShipFrnds.setStatus(RelationShipFriends.PENDING);
+
+                relationShipDAOImpl.save(relationShipFrnds);
+            }
+        }
+    }*/
+
+    @Transactional
+    public void addRelationship(Long userIdFrom, Long userIdTo) throws BadRequestException {
+        validateUserIds(userIdFrom, userIdTo);
+
+        RelationShipFrnds relationShipFrndsFind = relationShipDAOImpl.findRelByFromTo(userIdFrom, userIdTo);
+
+        if (relationShipFrndsFind == null) {
             RelationShipFrnds relationShipFrnds = new RelationShipFrnds();
             relationShipFrnds.setUserFrom(userIdFrom);
             relationShipFrnds.setUserTo(userIdTo);
             relationShipFrnds.setStatus(RelationShipFriends.PENDING);
 
             relationShipDAOImpl.save(relationShipFrnds);
-        }}
+        } else {
+            throw new BadRequestException("You have had relationShip with id " + userIdTo + " already");
+        }
+
     }
 
 
@@ -76,8 +112,67 @@ public class RelationshipService {
     }
 
     @Transactional
-    public RelationShipFrnds updateRelationship(Long userIdFrom, Long userIdTo, RelationShipFriends status) {
-        return relationShipDAOImpl.updateRelationship(userIdFrom, userIdTo, status);
+    public RelationShipFrnds updateRelationshipStatus(Long userIdFrom, Long userIdTo, RelationShipFriends status) throws BadRequestException {
+        validateUserIds(userIdFrom, userIdTo);
+
+        RelationShipFrnds relationShipFrnds = relationShipDAOImpl.findRelByFromTo(userIdFrom, userIdTo);
+        if (relationShipFrnds == null)
+            throw new BadRequestException("You have to add friends " + userIdTo);
+
+        if (relationShipFrnds.getStatus() == RelationShipFriends.PENDING && status == RelationShipFriends.CANCEL) {
+            relationShipFrnds.setStatus(status);
+
+        } else if (relationShipFrnds.getStatus() == RelationShipFriends.ACCEPT && status == RelationShipFriends.DELETE) {
+            relationShipFrnds.setStatus(status);
+
+        } else if (status == RelationShipFriends.PENDING) {
+            if (relationShipFrnds.getStatus() == RelationShipFriends.CANCEL ||
+                    relationShipFrnds.getStatus() == RelationShipFriends.DELETE ||
+                    relationShipFrnds.getStatus() == RelationShipFriends.DECLINE)
+                relationShipFrnds.setStatus(status);
+        } else {
+            throw new BadRequestException("Updating from status " + relationShipFrnds.getStatus() +
+                    " to status " + status + " does not allowed");
+        }
+
+        return relationShipDAOImpl.update(relationShipFrnds);
+    }
+
+    @Transactional
+    public RelationShipFrnds updateRelationshipStatusToRequest(Long userIdFrom, Long userIdTo, RelationShipFriends status) throws BadRequestException {
+        validateUserIds(userIdFrom, userIdTo);
+
+        RelationShipFrnds relationShipFrnds = relationShipDAOImpl.findRelByFromTo(userIdFrom, userIdTo);
+        if (relationShipFrnds == null)
+            throw new BadRequestException("You have to add friends " + userIdFrom);
+
+        if (relationShipFrnds.getStatus() == RelationShipFriends.PENDING ){
+            if ( status == RelationShipFriends.DECLINE || status == RelationShipFriends.ACCEPT){
+                relationShipFrnds.setStatus(status);
+            }
+        }  else if (relationShipFrnds.getStatus() == RelationShipFriends.ACCEPT && status == RelationShipFriends.DELETE) {
+            relationShipFrnds.setStatus(status);
+
+        } else {
+            throw new BadRequestException("Updating from status " + relationShipFrnds.getStatus() +
+                    " to status " + status + " does not allowed");
+        }
+
+        return relationShipDAOImpl.update(relationShipFrnds);
+    }
+
+    public boolean validateUserIds(Long userIdFrom, Long userIdTo) throws BadRequestException {
+        if (userIdTo == null || userIdTo <= 0)
+            throw new BadRequestException("Wrong userIdTo. Try again");
+        if (userIdFrom == userIdTo)
+            throw new BadRequestException("You can not send request  myself");
+
+        User userFind = userDAO.findOne(userIdTo);
+
+        if (userFind == null)
+            throw new BadRequestException("User with id " + userIdTo + "does not exist in DB");
+        return true;
+
     }
 
     public List<RelationShipFrnds> findRelByIdAnsw(Long id) {
