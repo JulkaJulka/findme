@@ -119,45 +119,29 @@ public class RelationshipService {
         if (relationShipFrnds == null)
             throw new BadRequestException("You have to add friends " + userIdTo);
 
-        if (relationShipFrnds.getStatus() == RelationShipFriends.PENDING && status == RelationShipFriends.CANCEL) {
+        if (status == RelationShipFriends.CANCEL && relationShipFrnds.getStatus() == RelationShipFriends.PENDING) {
             relationShipFrnds.setStatus(status);
 
-        } else if (relationShipFrnds.getStatus() == RelationShipFriends.ACCEPT && status == RelationShipFriends.DELETE) {
+        } else if (status == RelationShipFriends.DECLINE && relationShipFrnds.getStatus() == RelationShipFriends.PENDING) {
+            relationShipFrnds.setStatus(status);
+
+        } else if (status == RelationShipFriends.ACCEPT && relationShipFrnds.getStatus() == RelationShipFriends.PENDING) {
+            relationShipFrnds.setStatus(status);
+
+        } else if (status == RelationShipFriends.DELETE && relationShipFrnds.getStatus() == RelationShipFriends.ACCEPT) {
             relationShipFrnds.setStatus(status);
 
         } else if (status == RelationShipFriends.PENDING) {
-            if (relationShipFrnds.getStatus() == RelationShipFriends.CANCEL ||
-                    relationShipFrnds.getStatus() == RelationShipFriends.DELETE ||
-                    relationShipFrnds.getStatus() == RelationShipFriends.DECLINE)
-                relationShipFrnds.setStatus(status);
-        } else {
-            throw new BadRequestException("Updating from status " + relationShipFrnds.getStatus() +
-                    " to status " + status + " does not allowed");
-        }
 
-        return relationShipDAOImpl.update(relationShipFrnds);
-    }
-
-    @Transactional
-    public RelationShipFrnds updateRelationshipStatusToRequest(Long userIdFrom, Long userIdTo, RelationShipFriends status) throws BadRequestException {
-        validateUserIds(userIdFrom, userIdTo);
-
-        RelationShipFrnds relationShipFrnds = relationShipDAOImpl.findRelByFromTo(userIdFrom, userIdTo);
-        if (relationShipFrnds == null)
-            throw new BadRequestException("You have to add friends " + userIdFrom);
-
-        if (relationShipFrnds.getStatus() == RelationShipFriends.PENDING ){
-            if ( status == RelationShipFriends.DECLINE || status == RelationShipFriends.ACCEPT){
-                relationShipFrnds.setStatus(status);
-            }
-        }  else if (relationShipFrnds.getStatus() == RelationShipFriends.ACCEPT && status == RelationShipFriends.DELETE) {
+            if (relationShipFrnds.getStatus() == RelationShipFriends.PENDING || relationShipFrnds.getStatus() == RelationShipFriends.ACCEPT)
+                throw new BadRequestException("Updating from status " + relationShipFrnds.getStatus() +
+                        " to status " + status + " does not allowed");
             relationShipFrnds.setStatus(status);
 
         } else {
             throw new BadRequestException("Updating from status " + relationShipFrnds.getStatus() +
                     " to status " + status + " does not allowed");
         }
-
         return relationShipDAOImpl.update(relationShipFrnds);
     }
 

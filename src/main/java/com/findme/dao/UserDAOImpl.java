@@ -13,23 +13,20 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
-public class UserDAOImpl extends GenericDAOImpl<User> implements UserDAO{
-   private static String FIND_USER_BY_PHONE_EMAIL = "FROM User WHERE email = :email OR phone = :phone";
+public class UserDAOImpl extends GenericDAOImpl<User> implements UserDAO {
+    private static String FIND_USER_BY_PHONE_EMAIL = "FROM User WHERE email = :email OR phone = :phone";
     private static String FIND_USER_BY_EMAIL_PSWD = "FROM User WHERE email = :email AND password = :password";
-   //private static String FIND_USER_BY_PHONE_EMAIL = " SELECT * FROM USER_FM WHERE EMAIL =? OR PHONE = ?";
-   @PersistenceContext
-   private EntityManager entityManager;
 
-    public List<User> findByPhoneOrEmail(User user){
-     // NativeQuery<User> query = (NativeQuery<User>) getEntityManager().createNativeQuery(FIND_USER_BY_PHONE_EMAIL, User.class);
+    @PersistenceContext
+    private EntityManager entityManager;
 
-      //  user = query.setParameter(1, user.getPhone()).setParameter(2, user.getEmail()).uniqueResult();
+    public List<User> findByPhoneOrEmail(User user) {
 
         Query query = getEntityManager().createQuery(FIND_USER_BY_PHONE_EMAIL);
-       query.setParameter("email", user.getEmail());
+        query.setParameter("email", user.getEmail());
         query.setParameter("phone", user.getPhone());
-       // System.out.println(user.toString());
-        if(query.getResultList().isEmpty())
+
+        if (query.getResultList().isEmpty())
             return null;
         System.out.println(query.getResultList().toString());
         return query.getResultList();
@@ -37,7 +34,7 @@ public class UserDAOImpl extends GenericDAOImpl<User> implements UserDAO{
 
     @Transactional
     @Override
-    public User checkExistUsDB(String email, String password) throws NonUniqueResultException{
+    public User checkExistUsDB(String email, String password) throws NonUniqueResultException {
 
         Query query = getEntityManager().createQuery(FIND_USER_BY_EMAIL_PSWD);
         query.setParameter("email", email);
@@ -49,7 +46,7 @@ public class UserDAOImpl extends GenericDAOImpl<User> implements UserDAO{
             return null;
 
         else if (results.size() == 1)
-            return (User)results.get(0);
+            return (User) results.get(0);
 
         throw new NonUniqueResultException();
 

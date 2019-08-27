@@ -17,30 +17,9 @@ public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> 
     private static String FIND_RELATION_BY_ID = "from RelationShipFrnds WHERE USER_FROM = :idFrom AND USER_TO = :idTo ";
     private static String FIND_RELATION_BY_ID_ANSW = "SELECT r.userFrom FROM RelationShipFrnds r WHERE  r.userTo = :idAnsw AND r.status = :status ";
     private static String FIND_OUTCOME_BY_ID = "SELECT r.userTo FROM RelationShipFrnds r WHERE  r.userFrom = :idAnsw AND r.status = :status ";
-   // private static String FIND_RELATION_BY_ID_ANSW = "FROM RelationShipFrnds WHERE  userTo = :idAnsw AND status = :status";
 
     @PersistenceContext
     private EntityManager entityManager;
-
-    /*@Transactional
-    public void addRelationship(Long userIdFrom, Long userIdTo) {
-        RelationShipFrnds findRelFrnds = findRelByFromTo(userIdFrom, userIdTo);
-
-        if (findRelFrnds == null) {
-
-         RelationShipFrnds relationShipNewFrnds = new RelationShipFrnds();
-         relationShipNewFrnds.setUserFrom(userIdFrom);
-         relationShipNewFrnds.setUserTo(userIdTo);
-         relationShipNewFrnds.setStatus(RelationShipFriends.PENDING);
-
-         save(relationShipNewFrnds);
-
-        } else {
-
-            findRelFrnds.setStatus(RelationShipFriends.PENDING);
-            update(findRelFrnds);
-        }
-    }*/
 
     @Override
     public void answerToRequestFriend(Long idReq, Long idAnsw) {
@@ -58,7 +37,7 @@ public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> 
         if (results.isEmpty())
             return null;
 
-       return results;
+        return results;
 
     }
 

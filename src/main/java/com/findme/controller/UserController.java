@@ -147,7 +147,7 @@ public class UserController {
     public ResponseEntity<String> updateRelationship(HttpServletRequest request, @RequestParam("userIdFrom") String userIdFrom, @RequestParam("userIdTo") String userIdTo, @RequestParam("status") String status) {
         try {
             Long userIdToL = Long.parseLong(userIdTo);
-            Long userIdFromL = Long.parseLong(userIdTo);
+            Long userIdFromL = Long.parseLong(userIdFrom);
 
             HttpSession session = request.getSession();
 
@@ -156,13 +156,8 @@ public class UserController {
             if (userFrom == null)
                 return new ResponseEntity<>("You have to login", HttpStatus.UNAUTHORIZED);
 
-            if (userFrom.getId() == userIdToL) {
-                relationshipService.updateRelationshipStatusToRequest(Long.parseLong(userIdFrom), userIdToL, RelationShipFriends.valueOf(status));
+                relationshipService.updateRelationshipStatus(userIdFromL, userIdToL, RelationShipFriends.valueOf(status));
 
-            } else {
-
-                relationshipService.updateRelationshipStatus(userFrom.getId(), userIdToL, RelationShipFriends.valueOf(status));
-            }
             return new ResponseEntity<>("Update status sent successfully", HttpStatus.OK);
 
         } catch (NumberFormatException e) {
