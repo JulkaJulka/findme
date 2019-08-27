@@ -120,7 +120,6 @@ public class UserController {
             Long userIdToL = Long.parseLong(userIdTo);
 
             HttpSession session = request.getSession();
-            // session.getAttribute("id");
 
             User userFrom = (User) session.getAttribute("user");
 

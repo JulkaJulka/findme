@@ -22,65 +22,6 @@ public class RelationshipService {
     @Autowired
     private UserDAOImpl userDAO;
 
-    /*@Transactional
-    public void addRelationship(Long userIdFrom, Long userIdTo) throws BadRequestException {
-
-        if (userIdFrom == userIdTo)
-            throw new BadRequestException("You can not add myself");
-
-        RelationShipFrnds relationShipFind = relationShipDAOImpl.findRelByFromTo(userIdFrom, userIdTo);
-
-        if (relationShipFind == null) {
-
-            RelationShipFrnds relationShipFrnds = new RelationShipFrnds();
-            relationShipFrnds.setUserFrom(userIdFrom);
-            relationShipFrnds.setUserTo(userIdTo);
-            relationShipFrnds.setStatus(RelationShipFriends.PENDING);
-
-            relationShipDAOImpl.save(relationShipFrnds);
-        }
-
-        if (relationShipFind != null) {
-
-            if (relationShipFind.getStatus() == RelationShipFriends.PENDING)
-                throw new BadRequestException("You have to accept request from you friend " + userIdTo);
-
-            if (relationShipFind.getStatus() == RelationShipFriends.ACCEPT)
-                throw new BadRequestException("You have been already friends with " + userIdTo);
-
-            relationShipFind.setUserFrom(userIdFrom);
-            relationShipFind.setUserTo(userIdTo);
-            relationShipFind.setStatus(RelationShipFriends.PENDING);
-
-            relationShipDAOImpl.update(relationShipFind);
-        } else {
-
-            relationShipFind = relationShipDAOImpl.findRelByFromTo(userIdFrom, userIdTo);
-
-            if (relationShipFind != null) {
-
-                if (relationShipFind.getStatus() == RelationShipFriends.PENDING)
-                    throw new BadRequestException(userIdTo + " must accept your request that you had sent early");
-
-                if (relationShipFind.getStatus() == RelationShipFriends.ACCEPT)
-                    throw new BadRequestException("You have been already friends with " + userIdTo);
-
-                relationShipFind.setStatus(RelationShipFriends.PENDING);
-
-                relationShipDAOImpl.update(relationShipFind);
-
-            } else {
-
-                RelationShipFrnds relationShipFrnds = new RelationShipFrnds();
-                relationShipFrnds.setUserFrom(userIdFrom);
-                relationShipFrnds.setUserTo(userIdTo);
-                relationShipFrnds.setStatus(RelationShipFriends.PENDING);
-
-                relationShipDAOImpl.save(relationShipFrnds);
-            }
-        }
-    }*/
-
     @Transactional
     public void addRelationship(Long userIdFrom, Long userIdTo) throws BadRequestException {
         validateUserIds(userIdFrom, userIdTo);
