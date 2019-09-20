@@ -82,6 +82,23 @@
             </form>
         </div>
         <div>
+            <form id="form-deleteFriend" action="/deleteFriend">
+
+                <input path="userIdFromDelete"
+                       class="inputtext _58mg _5dba _2ph-"
+                       name="userIdFromDelete"
+                       id="u_0_df"  placeholder="id friendFromDelete" required>
+
+                <input path="userIdToDelete"
+                       class="inputtext _58mg _5dba _2ph-"
+                       name="userIdToDelete"
+                       id="u_0_dt"  placeholder="id friendDelete" required>
+
+                <button class="btn" type="submit" name="deleteFriend">deleteFriend</button>
+
+            </form>
+        </div>
+        <div>
            <!--<button id="getRequest" class="btn" type="submit" name="getRequest" href="/user/reqflist">Requests to add to friends </button>-->
             <button onclick="window.location='/user/reqflist'">Requests to add to friends </button>
             <button onclick="window.location='/user/outflist'">Your Outcome requests to add Friends  </button>
@@ -188,6 +205,45 @@
            success: function success() {
                debugger;
                alert("Update is  successfully");
+               window.location.href = 'profile';
+               // $(this).load('testForRedirect.html');
+           },
+           error: function error(e) {
+
+               if(e.status === 400){
+                   alert("Wrong friend's id. Try again.");
+                   window.location.href = 'index';
+
+               }
+
+               if(e.status === 401){
+                   alert("You have not permissions. Please, login to site");
+                   window.location.href = 'index';
+
+               }
+
+               if(e.status === 500){
+                   alert("Something went wrong.. .");
+                   window.location.href = 'index';
+
+               }
+               // $(this).load('testForRedirect.html');
+
+           }
+       });
+       e.preventDefault();
+   })
+
+   $("#form-deleteFriend").submit(function (e) {
+       var form = $(this).serialize();
+       $.ajax({
+           type: "POST",
+           url: "/deleteFriend",
+           data: form,
+
+           success: function success() {
+               debugger;
+               alert("delete is  successfully");
                window.location.href = 'profile';
                // $(this).load('testForRedirect.html');
            },

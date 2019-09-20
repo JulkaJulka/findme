@@ -12,6 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 @Service
@@ -37,6 +41,35 @@ public class RelationshipService {
             relationShipDAOImpl.save(relationShipFrnds);
         } else {
             throw new BadRequestException("You have had relationShip with id " + userIdTo + " already");
+        }
+
+    }
+
+    @Transactional
+    public void deleteRelationShip(Long userIdFrom, Long userIdTo) throws BadRequestException {
+        validateUserIds(userIdFrom, userIdTo);
+
+        RelationShipFrnds relationShipFrndsFind = relationShipDAOImpl.findRelByFromTo(userIdFrom, userIdTo);
+
+        if (relationShipFrndsFind == null) {
+            throw new BadRequestException("You are not any Relationship with " + userIdTo);
+        }
+
+
+        Calendar calMax = Calendar.getInstance();
+        Calendar dateStatus = new GregorianCalendar();
+        dateStatus.setTime(relationShipFrndsFind.getDate_status());
+
+        calMax.add(Calendar.DATE, -3);
+        Date dateMaxForCompare = calMax.getTime();
+
+
+
+        if( relationShipFrndsFind.getStatus() == RelationShipFriends.ACCEPT && dateMaxForCompare.compareTo( dateStatus.getTime())  >= 0){
+
+            relationShipDAOImpl.updateRelationship(userIdFrom, userIdTo, RelationShipFriends.DELETE);
+        } else {
+            throw new BadRequestException("You have not permission to delete id " + userIdTo);
         }
 
     }

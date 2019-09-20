@@ -168,6 +168,58 @@ public class UserController {
         }
     }
 
+    @RequestMapping(path = "/deleteFriend", method = RequestMethod.POST)
+    public ResponseEntity<String> deleteFriend(HttpServletRequest request, @RequestParam("userIdFromDelete") String userIdFrom, @RequestParam("userIdToDelete") String userIdTo) {
+        try {
+            Long userIdToL = Long.parseLong(userIdTo);
+            Long userIdFromL = Long.parseLong(userIdFrom);
+
+            HttpSession session = request.getSession();
+
+            User userFrom = (User) session.getAttribute("user");
+
+            if (userFrom == null)
+                return new ResponseEntity<>("You have to login", HttpStatus.UNAUTHORIZED);
+
+            relationshipService.deleteRelationShip(userIdFromL, userIdToL);
+            return new ResponseEntity<>("Request sent successfully", HttpStatus.OK);
+
+        } catch (NumberFormatException e) {
+            return new ResponseEntity<>("Wrong friend's id. Try again.", HttpStatus.BAD_REQUEST);
+        } catch (BadRequestException e) {
+            return new ResponseEntity<>("You can not add myself.", HttpStatus.BAD_REQUEST);
+        } catch (HttpServerErrorException.InternalServerError e) {
+            return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+   /* @RequestMapping(path = "/deleteFriend", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<String> deleteFriend(HttpServletRequest request, @RequestParam("id_userIdDelete") String userIdTo) {
+        try {
+            Long userIdToL = Long.parseLong(userIdTo);
+
+            HttpSession session = request.getSession();
+
+            User userFrom = (User) session.getAttribute("user");
+
+            if (userFrom == null)
+                return new ResponseEntity<>("You have to login", HttpStatus.UNAUTHORIZED);
+
+            relationshipService.deleteRelationShip(userFrom.getId(), userIdToL);
+            return new ResponseEntity<>("Request sent successfully", HttpStatus.OK);
+
+
+        } catch (NumberFormatException e) {
+            return new ResponseEntity<>("Wrong friend's id. Try again.", HttpStatus.BAD_REQUEST);
+
+        } catch (BadRequestException e) {
+
+            return new ResponseEntity<>("You can not add myself.", HttpStatus.BAD_REQUEST);
+        } catch (HttpServerErrorException.InternalServerError e) {
+            return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }*/
+
     @RequestMapping(value = "/user/reqflist", method = RequestMethod.GET)
     @ResponseBody
     public ModelAndView getIncomeRequests(HttpSession session) throws BadRequestException {

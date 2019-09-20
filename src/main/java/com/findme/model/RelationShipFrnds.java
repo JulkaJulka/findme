@@ -3,6 +3,7 @@ package com.findme.model;
 import com.findme.model.RelationShipFriends;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "RELATIONSHIP")
@@ -12,10 +13,10 @@ public class RelationShipFrnds {
     private Long userFrom;
     private Long userTo;
     private RelationShipFriends status;
+    private Date date_status;
 
     public RelationShipFrnds() {
     }
-
 
 
     @Id
@@ -42,6 +43,16 @@ public class RelationShipFrnds {
         return status;
     }
 
+    @Temporal(TemporalType.DATE)
+    @Column(name = "DATE_STATUS")
+    public Date getDate_status() {
+        return date_status;
+    }
+
+    public void setDate_status(Date date_status) {
+        this.date_status = date_status;
+    }
+
     public void setIdRelation(Long idRelation) {
         this.idRelation = idRelation;
     }
@@ -66,6 +77,7 @@ public class RelationShipFrnds {
                 ", userFrom=" + userFrom +
                 ", userTo=" + userTo +
                 ", status=" + status +
+                ", date_status=" + date_status +
                 '}';
     }
 }

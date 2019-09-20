@@ -9,6 +9,7 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -41,6 +42,8 @@ public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> 
 
     }
 
+
+
     @Override
     public List<Long> getIncomeRequests(String userId) {
         Long userIdL = Long.parseLong(userId);
@@ -71,15 +74,10 @@ public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> 
         return results;
     }
 
-    /*@Override
-    public RelationShipFrnds responseToRequest(Long userIdFrom, Long userIdTo, RelationShipFriends status) {
-        RelationShipFrnds findRelFrnds = findRelByFromTo(userIdFrom, userIdTo);
-        findRelFrnds.setStatus(status);
-        return findRelFrnds;
-    }*/
 
     public RelationShipFrnds updateRelationship(Long userIdFrom, Long userIdTo, RelationShipFriends status) {
         RelationShipFrnds findRelFrnds = findRelByFromTo(userIdFrom, userIdTo);
+        findRelFrnds.setDate_status(new Date());
         findRelFrnds.setStatus(status);
         return update(findRelFrnds);
     }
