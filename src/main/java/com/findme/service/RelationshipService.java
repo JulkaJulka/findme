@@ -1,10 +1,9 @@
 package com.findme.service;
 
 import com.findme.BadRequestException;
-import com.findme.NotFoundException;
+import com.findme.LimitExceed;
 import com.findme.dao.RelationShipFrndsDAOImpl;
 import com.findme.dao.UserDAOImpl;
-import com.findme.model.RelationShip;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.RelationShipFrnds;
 import com.findme.model.User;
@@ -13,16 +12,17 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 @Service
 public class RelationshipService {
 
+    private static long MAX_AMOUNT_OUTCOME_REQUESTS = 10;
+    private static long LIMIT_FRIENDS = 100;
+
+
     @Autowired
-    private RelationShipFrndsDAOImpl relationShipDAOImpl;
+    private RelationShipFrndsDAOImpl relationShipFrndsDAO;
     @Autowired
     private UserDAOImpl userDAO;
 
@@ -30,7 +30,12 @@ public class RelationshipService {
     public void addRelationship(Long userIdFrom, Long userIdTo) throws BadRequestException {
         validateUserIds(userIdFrom, userIdTo);
 
-        RelationShipFrnds relationShipFrndsFind = relationShipDAOImpl.findRelByFromTo(userIdFrom, userIdTo);
+        List<Long> listPending = relationShipFrndsDAO.getRelationsByStatus(userIdFrom.toString(), RelationShipFriends.PENDING);
+
+        if (listPending != null && listPending.size() >= MAX_AMOUNT_OUTCOME_REQUESTS)
+            throw new LimitExceed("You have exceed limit of outcome requests");
+
+        RelationShipFrnds relationShipFrndsFind = relationShipFrndsDAO.findRelByFromTo(userIdFrom, userIdTo);
 
         if (relationShipFrndsFind == null) {
             RelationShipFrnds relationShipFrnds = new RelationShipFrnds();
@@ -38,86 +43,37 @@ public class RelationshipService {
             relationShipFrnds.setUserTo(userIdTo);
             relationShipFrnds.setStatus(RelationShipFriends.PENDING);
 
-            relationShipDAOImpl.save(relationShipFrnds);
+            relationShipFrndsDAO.save(relationShipFrnds);
         } else {
             throw new BadRequestException("You have had relationShip with id " + userIdTo + " already");
         }
-
     }
 
     @Transactional
     public void deleteRelationShip(Long userIdFrom, Long userIdTo) throws BadRequestException {
-        validateUserIds(userIdFrom, userIdTo);
-
-        RelationShipFrnds relationShipFrndsFind = relationShipDAOImpl.findRelByFromTo(userIdFrom, userIdTo);
-
-        if (relationShipFrndsFind == null) {
-            throw new BadRequestException("You are not any Relationship with " + userIdTo);
-        }
-
-
-        Calendar calMax = Calendar.getInstance();
-        Calendar dateStatus = new GregorianCalendar();
-        dateStatus.setTime(relationShipFrndsFind.getDate_status());
-
-        calMax.add(Calendar.DATE, -3);
-        Date dateMaxForCompare = calMax.getTime();
-
-
-
-        if( relationShipFrndsFind.getStatus() == RelationShipFriends.ACCEPT && dateMaxForCompare.compareTo( dateStatus.getTime())  >= 0){
-
-            relationShipDAOImpl.updateRelationship(userIdFrom, userIdTo, RelationShipFriends.DELETE);
-        } else {
-            throw new BadRequestException("You have not permission to delete id " + userIdTo);
-        }
-
+        updateRelationshipStatus(userIdFrom, userIdTo, RelationShipFriends.DELETE);
     }
 
 
     @Transactional
     public List<Long> getIncomeRequests(String userId) {
-        return relationShipDAOImpl.getIncomeRequests(userId);
+        return relationShipFrndsDAO.getIncomeRequests(userId);
     }
 
     @Transactional
     public List<Long> getOutcomeRequests(String userId) {
-        return relationShipDAOImpl.getOutcomeRequests(userId);
+        return relationShipFrndsDAO.getOutcomeRequests(userId);
     }
 
     @Transactional
-    public RelationShipFrnds updateRelationshipStatus(Long userIdFrom, Long userIdTo, RelationShipFriends status) throws BadRequestException {
-        validateUserIds(userIdFrom, userIdTo);
-
-        RelationShipFrnds relationShipFrnds = relationShipDAOImpl.findRelByFromTo(userIdFrom, userIdTo);
-        if (relationShipFrnds == null)
-            throw new BadRequestException("You have to add friends " + userIdTo);
-
-        if (status == RelationShipFriends.CANCEL && relationShipFrnds.getStatus() == RelationShipFriends.PENDING) {
-            relationShipFrnds.setStatus(status);
-
-        } else if (status == RelationShipFriends.DECLINE && relationShipFrnds.getStatus() == RelationShipFriends.PENDING) {
-            relationShipFrnds.setStatus(status);
-
-        } else if (status == RelationShipFriends.ACCEPT && relationShipFrnds.getStatus() == RelationShipFriends.PENDING) {
-            relationShipFrnds.setStatus(status);
-
-        } else if (status == RelationShipFriends.DELETE && relationShipFrnds.getStatus() == RelationShipFriends.ACCEPT) {
-            relationShipFrnds.setStatus(status);
-
-        } else if (status == RelationShipFriends.PENDING) {
-
-            if (relationShipFrnds.getStatus() == RelationShipFriends.PENDING || relationShipFrnds.getStatus() == RelationShipFriends.ACCEPT)
-                throw new BadRequestException("Updating from status " + relationShipFrnds.getStatus() +
-                        " to status " + status + " does not allowed");
-            relationShipFrnds.setStatus(status);
-
-        } else {
-            throw new BadRequestException("Updating from status " + relationShipFrnds.getStatus() +
-                    " to status " + status + " does not allowed");
-        }
-        return relationShipDAOImpl.update(relationShipFrnds);
+    public RelationShipFrnds updateRelationshipStatus(Long userIdFrom, Long userIdTo, RelationShipFriends status) throws BadRequestException, LimitExceed {
+        RelationShipFrnds relationShipFrnds = relationShipFrndsDAO.findRelByFromTo(userIdFrom, userIdTo);
+        DispenseChain dispenseChain = new DispenseChain(relationShipFrndsDAO);
+        dispenseChain.init(status, relationShipFrnds);
+        return relationShipFrnds;
     }
+
+
 
     public boolean validateUserIds(Long userIdFrom, Long userIdTo) throws BadRequestException {
         if (userIdTo == null || userIdTo <= 0)
@@ -134,7 +90,7 @@ public class RelationshipService {
     }
 
     public List<RelationShipFrnds> findRelByIdAnsw(Long id) {
-        return relationShipDAOImpl.findRelsByIdAnsw(id);
+        return relationShipFrndsDAO.findRelsByIdAnsw(id);
     }
 
 

@@ -2,13 +2,14 @@ package com.findme.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.findme.BadRequestException;
+import com.findme.LimitExceed;
 import com.findme.NotFoundException;
 import com.findme.dao.RelationShipFrndsDAOImpl;
 import com.findme.model.RelationShipFriends;
-import com.findme.model.RelationShipFrnds;
 import com.findme.model.User;
 import com.findme.service.RelationshipService;
 import com.findme.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -39,6 +40,7 @@ public class UserController {
         this.relationShipFrndsSErvice = relationShipFrndsSErvice;
     }*/
 
+    @Autowired
     public UserController(UserService userService, RelationshipService relationshipService, RelationShipFrndsDAOImpl relationShipFrndsDAO) {
         this.userService = userService;
         this.relationshipService = relationshipService;
@@ -155,7 +157,8 @@ public class UserController {
             if (userFrom == null)
                 return new ResponseEntity<>("You have to login", HttpStatus.UNAUTHORIZED);
 
-                relationshipService.updateRelationshipStatus(userIdFromL, userIdToL, RelationShipFriends.valueOf(status));
+
+            relationshipService.updateRelationshipStatus(userIdFromL, userIdToL, RelationShipFriends.valueOf(status));
 
             return new ResponseEntity<>("Update status sent successfully", HttpStatus.OK);
 
@@ -247,7 +250,7 @@ public class UserController {
 
     @RequestMapping(value = "/user/outflist", method = RequestMethod.GET)
     @ResponseBody
-    public ModelAndView getOutcomeRequests(HttpSession session) {
+    public ModelAndView getOutcomeRequests(HttpSession session) throws LimitExceed {
 
         ModelAndView model = new ModelAndView("badRequestExcp");
 

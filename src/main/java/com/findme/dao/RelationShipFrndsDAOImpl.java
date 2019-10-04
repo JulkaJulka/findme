@@ -17,7 +17,8 @@ public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> 
 
     private static String FIND_RELATION_BY_ID = "from RelationShipFrnds WHERE USER_FROM = :idFrom AND USER_TO = :idTo ";
     private static String FIND_RELATION_BY_ID_ANSW = "SELECT r.userFrom FROM RelationShipFrnds r WHERE  r.userTo = :idAnsw AND r.status = :status ";
-    private static String FIND_OUTCOME_BY_ID = "SELECT r.userTo FROM RelationShipFrnds r WHERE  r.userFrom = :idAnsw AND r.status = :status ";
+    private static String FIND_BY_IDFRPOM_STATUS = "SELECT r.userTo FROM RelationShipFrnds r WHERE  r.userFrom = :userFrom AND r.status = :status ";
+
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -42,8 +43,6 @@ public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> 
 
     }
 
-
-
     @Override
     public List<Long> getIncomeRequests(String userId) {
         Long userIdL = Long.parseLong(userId);
@@ -59,12 +58,20 @@ public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> 
         return results;
     }
 
+    public List<Long> getFriends(String userId) {
+        return getRelationsByStatus(userId, RelationShipFriends.ACCEPT);
+    }
+
     @Override
     public List<Long> getOutcomeRequests(String userId) {
-        Long userIdL = Long.parseLong(userId);
-        Query query = getEntityManager().createQuery(FIND_OUTCOME_BY_ID);
-        query.setParameter("idAnsw", userIdL);
-        query.setParameter("status", RelationShipFriends.PENDING);
+        return getRelationsByStatus(userId, RelationShipFriends.PENDING);
+    }
+
+    public List<Long> getRelationsByStatus(String userIdFrom, RelationShipFriends status) {
+        Long userIdL = Long.parseLong(userIdFrom);
+        Query query = getEntityManager().createQuery(FIND_BY_IDFRPOM_STATUS);
+        query.setParameter("userFrom", userIdL);
+        query.setParameter("status", status);
 
         List results = query.getResultList();
 

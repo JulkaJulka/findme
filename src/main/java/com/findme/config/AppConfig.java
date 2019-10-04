@@ -1,5 +1,9 @@
 package com.findme.config;
 
+import com.findme.BadRequestException;
+import com.findme.LimitExceed;
+import com.findme.dao.RelationShipFrndsDAOImpl;
+import com.findme.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -90,6 +94,37 @@ public  class AppConfig implements WebMvcConfigurer {
         transactionManager.setEntityManagerFactory(em);
         return transactionManager;
     }
+
+    @Bean
+    RelationShipFrndsDAOImpl relationShipFrndsDAO()  {
+        return new RelationShipFrndsDAOImpl();
+    }
+
+    @Bean
+    CancelChain cancelChain(){
+        return new CancelChain(relationShipFrndsDAO());
+    }
+
+    @Bean
+    AcceptChain acceptChain(){
+        return  new AcceptChain(relationShipFrndsDAO());
+    }
+
+    @Bean
+    DeclineChain declineChain(){
+        return new DeclineChain(relationShipFrndsDAO());
+    }
+
+    @Bean
+    PendingChain pendingChain(){
+        return new PendingChain(relationShipFrndsDAO());
+    }
+
+    @Bean
+    DeleteChain deleteChain(){
+        return new DeleteChain(relationShipFrndsDAO());
+    }
+
 
    /*Properties additionalProperties(){
        Properties properties = new Properties();
