@@ -67,6 +67,7 @@ public class RelationshipService {
 
     @Transactional
     public RelationShipFrnds updateRelationshipStatus(Long userIdFrom, Long userIdTo, RelationShipFriends status) throws BadRequestException, LimitExceed {
+        validateUserIds(userIdFrom, userIdTo);
         RelationShipFrnds relationShipFrnds = relationShipFrndsDAO.findRelByFromTo(userIdFrom, userIdTo);
         DispenseChain dispenseChain = new DispenseChain(relationShipFrndsDAO);
         dispenseChain.init(status, relationShipFrnds);

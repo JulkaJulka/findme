@@ -24,10 +24,7 @@ public class CancelChain extends ChainGeneral {
 
     @Override
     public void dispense(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed {
-       // validateUserIds(userIdFrom, userIdTo);
 
-       // RelationShipFrnds relationShipFrnds = getRelationShipDAOImpl().findRelByFromTo(userIdFrom, userIdTo);
-       // setRelationShipFrnds(relationShipFrnds);
         if (relationShipFrnds == null)
             throw new BadRequestException("You have to add friends " + relationShipFrnds.getUserTo());
 
