@@ -14,6 +14,7 @@ import java.util.List;
 
 @Component
 public class PendingChain extends ChainGeneral {
+    private static long MAX_AMOUNT_OUTCOME_REQUESTS = 10;
 
    @Autowired
     public PendingChain(RelationShipFrndsDAOImpl relationShipFrndsDAO) {
@@ -22,7 +23,7 @@ public class PendingChain extends ChainGeneral {
     
 
     @Override
-    public void dispense(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed {
+    public void check(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed {
         if (status == RelationShipFriends.PENDING) {
 
             List<Long> listPending = relationShipDAOImpl.getRelationsByStatus(relationShipFrnds.getUserFrom().toString(), RelationShipFriends.PENDING);

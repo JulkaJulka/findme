@@ -23,7 +23,7 @@ public class CancelChain extends ChainGeneral {
 
 
     @Override
-    public void dispense(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed {
+    public void check(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed {
 
         if (relationShipFrnds == null)
             throw new BadRequestException("You have to add friends " + relationShipFrnds.getUserTo());
@@ -35,7 +35,7 @@ public class CancelChain extends ChainGeneral {
 
 
     } else {
-            this.chain.dispense(status,relationShipFrnds);
+            this.chain.check(status,relationShipFrnds);
         }
     }
 }

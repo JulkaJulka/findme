@@ -5,7 +5,6 @@ import com.findme.LimitExceed;
 import com.findme.dao.RelationShipFrndsDAOImpl;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.RelationShipFrnds;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class ChainGeneral implements Chain {
 
@@ -13,8 +12,7 @@ public abstract class ChainGeneral implements Chain {
 
     public RelationShipFrndsDAOImpl relationShipDAOImpl;
     public RelationShipFrnds relationShipFrnds;
-    public static long MAX_AMOUNT_OUTCOME_REQUESTS = 10;
-    public static long LIMIT_FRIENDS = 100;
+
 
 
    public ChainGeneral() {
@@ -33,20 +31,9 @@ public abstract class ChainGeneral implements Chain {
     }
 
     @Override
-    public abstract void dispense(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed;
+    public abstract void check(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed;
 
     public RelationShipFrnds getRelationShipFrnds() {
         return relationShipFrnds;
     }
 }
-
-/*
-
-
-
-
-    public void setRelationShipFrnds(RelationShipFrnds relationShipFrnds) {
-        this.relationShipFrnds = relationShipFrnds;
-    }
-}
-*/

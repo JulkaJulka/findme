@@ -22,7 +22,7 @@ public class DeleteChain extends ChainGeneral {
     }
 
     @Override
-    public void dispense(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed {
+    public void check(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed {
         if (status == RelationShipFriends.DELETE && relationShipFrnds.getStatus() == RelationShipFriends.ACCEPT) {
             Calendar calMax = Calendar.getInstance();
             Calendar dateStatus = new GregorianCalendar();
@@ -45,7 +45,7 @@ public class DeleteChain extends ChainGeneral {
         } else
 
         {
-        this.chain.dispense(status, relationShipFrnds);
+        this.chain.check(status, relationShipFrnds);
         }
 }
 }

@@ -1,9 +1,7 @@
 package com.findme.service;
 
 import com.findme.BadRequestException;
-import com.findme.LimitExceed;
 import com.findme.dao.RelationShipFrndsDAOImpl;
-import com.findme.model.RelationShip;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.RelationShipFrnds;
 import org.springframework.stereotype.Component;
@@ -28,6 +26,6 @@ public class DispenseChain {
     }
 
     public void init( RelationShipFriends status, RelationShipFrnds relationship)throws BadRequestException{
-        chain.dispense(status, relationship);
+        chain.check(status, relationship);
     }
 }

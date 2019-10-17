@@ -19,12 +19,12 @@ public class DeclineChain extends ChainGeneral {
     }
 
     @Override
-    public void dispense(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed {
+    public void check(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed {
         if (status == RelationShipFriends.DECLINE && getRelationShipFrnds().getStatus() == RelationShipFriends.PENDING) {
             getRelationShipFrnds().setStatus(status);
             relationShipFrnds.setDate_status(new Date());
            getRelationShipDAOImpl().update(getRelationShipFrnds());
     } else {
-        this.chain.dispense(status,relationShipFrnds);}
+        this.chain.check(status,relationShipFrnds);}
     }
 }

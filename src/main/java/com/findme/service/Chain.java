@@ -8,5 +8,5 @@ import com.findme.model.RelationShipFrnds;
 public interface Chain {
 
     void setNextChain(Chain nextChain);
-    void dispense(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed;
+    void check(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed;
 }

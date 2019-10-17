@@ -14,14 +14,14 @@ import java.util.List;
 @Component
 public class AcceptChain extends ChainGeneral {
 
-
+    private static long LIMIT_FRIENDS = 100;
 @Autowired
     public AcceptChain(RelationShipFrndsDAOImpl relationShipFrndsDAO) {
         this.relationShipDAOImpl = relationShipFrndsDAO;
     }
 
     @Override
-    public void dispense(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed {
+    public void check(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed {
         if (status == RelationShipFriends.ACCEPT && relationShipFrnds.getStatus() == RelationShipFriends.PENDING) {
             List<Long> listAccept = relationShipDAOImpl.getRelationsByStatus(relationShipFrnds.getUserFrom().toString(), RelationShipFriends.ACCEPT);
             if (listAccept != null && listAccept.size() >= LIMIT_FRIENDS)
@@ -30,7 +30,7 @@ public class AcceptChain extends ChainGeneral {
             relationShipFrnds.setDate_status(new Date());
             getRelationShipDAOImpl().update(relationShipFrnds);
         } else {
-            this.chain.dispense(status, relationShipFrnds);
+            this.chain.check(status, relationShipFrnds);
         }
     }
 }

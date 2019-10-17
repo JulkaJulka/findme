@@ -18,13 +18,13 @@ import java.util.List;
 public class RelationshipService {
 
     private static long MAX_AMOUNT_OUTCOME_REQUESTS = 10;
-    private static long LIMIT_FRIENDS = 100;
-
 
     @Autowired
     private RelationShipFrndsDAOImpl relationShipFrndsDAO;
     @Autowired
     private UserDAOImpl userDAO;
+    @Autowired
+    private DispenseChain dispenseChain;
 
     @Transactional
     public void addRelationship(Long userIdFrom, Long userIdTo) throws BadRequestException {
@@ -66,10 +66,9 @@ public class RelationshipService {
     }
 
     @Transactional
-    public RelationShipFrnds updateRelationshipStatus(Long userIdFrom, Long userIdTo, RelationShipFriends status) throws BadRequestException, LimitExceed {
+    public RelationShipFrnds updateRelationshipStatus(Long userIdFrom, Long userIdTo, RelationShipFriends status) throws BadRequestException {
         validateUserIds(userIdFrom, userIdTo);
         RelationShipFrnds relationShipFrnds = relationShipFrndsDAO.findRelByFromTo(userIdFrom, userIdTo);
-        DispenseChain dispenseChain = new DispenseChain(relationShipFrndsDAO);
         dispenseChain.init(status, relationShipFrnds);
         return relationShipFrnds;
     }
