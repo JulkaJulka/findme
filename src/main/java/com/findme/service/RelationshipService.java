@@ -26,7 +26,6 @@ public class RelationshipService {
     @Autowired
     private DispenseChain dispenseChain;
 
-    @Transactional
     public void addRelationship(Long userIdFrom, Long userIdTo) throws BadRequestException {
         validateUserIds(userIdFrom, userIdTo);
 
@@ -49,31 +48,20 @@ public class RelationshipService {
         }
     }
 
-    @Transactional
-    public void deleteRelationShip(Long userIdFrom, Long userIdTo) throws BadRequestException {
-        updateRelationshipStatus(userIdFrom, userIdTo, RelationShipFriends.DELETE);
-    }
-
-
-    @Transactional
     public List<Long> getIncomeRequests(String userId) {
         return relationShipFrndsDAO.getIncomeRequests(userId);
     }
 
-    @Transactional
     public List<Long> getOutcomeRequests(String userId) {
         return relationShipFrndsDAO.getOutcomeRequests(userId);
     }
 
-    @Transactional
     public RelationShipFrnds updateRelationshipStatus(Long userIdFrom, Long userIdTo, RelationShipFriends status) throws BadRequestException {
         validateUserIds(userIdFrom, userIdTo);
         RelationShipFrnds relationShipFrnds = relationShipFrndsDAO.findRelByFromTo(userIdFrom, userIdTo);
         dispenseChain.init(status, relationShipFrnds);
         return relationShipFrnds;
     }
-
-
 
     public boolean validateUserIds(Long userIdFrom, Long userIdTo) throws BadRequestException {
         if (userIdTo == null || userIdTo <= 0)

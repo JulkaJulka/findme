@@ -82,6 +82,7 @@ public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> 
     }
 
 
+    @Transactional
     public RelationShipFrnds updateRelationship(Long userIdFrom, Long userIdTo, RelationShipFriends status) {
         RelationShipFrnds findRelFrnds = findRelByFromTo(userIdFrom, userIdTo);
         findRelFrnds.setDate_status(new Date());
