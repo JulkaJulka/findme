@@ -32,7 +32,7 @@ public class UserController {
     private UserService userService;
     private RelationshipService relationshipService;
     private RelationShipFrndsDAOImpl relationShipFrndsDAO;
-    // private UserDAOImpl userDAO;
+
 
     @Autowired
     public UserController(UserService userService, RelationshipService relationshipService, RelationShipFrndsDAOImpl relationShipFrndsDAO) {
@@ -109,139 +109,6 @@ public class UserController {
         }
     }
 
-   /* @RequestMapping(path = "/addRelationship", method = RequestMethod.POST)
-    @ResponseBody
-    public ResponseEntity<String> addRelationship(HttpServletRequest request, @RequestParam("id_friend") String userIdTo) {
-        try {
-            Long userIdToL = Long.parseLong(userIdTo);
-
-            HttpSession session = request.getSession();
-
-            User userFrom = (User) session.getAttribute("user");
-
-            if (userFrom == null)
-                return new ResponseEntity<>("You have to login", HttpStatus.UNAUTHORIZED);
-
-            relationshipService.addRelationship(userFrom.getId(), userIdToL);
-            return new ResponseEntity<>("Request sent successfully", HttpStatus.OK);
-
-
-        } catch (NumberFormatException e) {
-            return new ResponseEntity<>("Wrong friend's id. Try again.", HttpStatus.BAD_REQUEST);
-
-        } catch (BadRequestException e) {
-
-            return new ResponseEntity<>("You can not add myself.", HttpStatus.BAD_REQUEST);
-        } catch (HttpServerErrorException.InternalServerError e) {
-            return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-
-    @RequestMapping(path = "/updateRelationship", method = RequestMethod.POST)
-    public ResponseEntity<String> updateRelationship(HttpServletRequest request, @RequestParam("userIdFrom") String userIdFrom, @RequestParam("userIdTo") String userIdTo, @RequestParam("status") String status) {
-        try {
-            Long userIdToL = Long.parseLong(userIdTo);
-            Long userIdFromL = Long.parseLong(userIdFrom);
-
-            HttpSession session = request.getSession();
-
-            User userFrom = (User) session.getAttribute("user");
-
-            if (userFrom == null)
-                return new ResponseEntity<>("You have to login", HttpStatus.UNAUTHORIZED);
-
-
-            relationshipService.updateRelationshipStatus(userIdFromL, userIdToL, RelationShipFriends.valueOf(status));
-
-            return new ResponseEntity<>("Update status sent successfully", HttpStatus.OK);
-
-        } catch (NumberFormatException e) {
-            return new ResponseEntity<>("Wrong friend's id. Try again.", HttpStatus.BAD_REQUEST);
-        } catch (BadRequestException e) {
-            return new ResponseEntity<>("You can not add myself.", HttpStatus.BAD_REQUEST);
-        } catch (HttpServerErrorException.InternalServerError e) {
-            return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @RequestMapping(path = "/deleteFriend", method = RequestMethod.POST)
-    public ResponseEntity<String> deleteFriend(HttpServletRequest request, @RequestParam("userIdFromDelete") String userIdFrom, @RequestParam("userIdToDelete") String userIdTo) {
-        try {
-            Long userIdToL = Long.parseLong(userIdTo);
-            Long userIdFromL = Long.parseLong(userIdFrom);
-
-            HttpSession session = request.getSession();
-
-            User userFrom = (User) session.getAttribute("user");
-
-            if (userFrom == null)
-                return new ResponseEntity<>("You have to login", HttpStatus.UNAUTHORIZED);
-
-            relationshipService.deleteRelationShip(userIdFromL, userIdToL);
-            return new ResponseEntity<>("Request sent successfully", HttpStatus.OK);
-
-        } catch (NumberFormatException e) {
-            return new ResponseEntity<>("Wrong friend's id. Try again.", HttpStatus.BAD_REQUEST);
-        } catch (BadRequestException e) {
-            return new ResponseEntity<>("You can not add myself.", HttpStatus.BAD_REQUEST);
-        } catch (HttpServerErrorException.InternalServerError e) {
-            return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-/*
-
-    @RequestMapping(value = "/user/reqflist", method = RequestMethod.GET)
-    @ResponseBody
-    public ModelAndView getIncomeRequests(HttpSession session) throws BadRequestException {
-
-
-        ModelAndView model = new ModelAndView("badRequestExcp");
-
-        if (session.getAttribute("id") == null) {
-
-            return model;
-        }
-
-        Long id = (Long) session.getAttribute("id");
-        List<Long> list = relationshipService.getIncomeRequests(id.toString());
-
-        model.setViewName("reqflist");
-        model.addObject("lists", list);
-
-        return model;
-    }
-
-    //  public RelationShipFrnds updateRelationShip(String userIdFrom, String userIdTo, RelationShipFriends status) {
-    //   return relationshipService.updateRelationship(Long.parseLong(userIdFrom), Long.parseLong(userIdTo), status);
-    // }
-
-    @RequestMapping(value = "/user/outflist", method = RequestMethod.GET)
-    @ResponseBody
-    public ModelAndView getOutcomeRequests(HttpSession session) throws LimitExceed {
-
-        ModelAndView model = new ModelAndView("badRequestExcp");
-
-        if (session.getAttribute("id") == null) {
-
-            return model;
-        }
-
-        Long id = (Long) session.getAttribute("id");
-        List<Long> list = relationshipService.getOutcomeRequests(id.toString());
-
-        model.setViewName("outflist");
-        model.addObject("lists", list);
-
-        return model;
-    }
-
-
-    @RequestMapping(path = "/index", method = RequestMethod.GET)
-    public String getIndex() {
-        return "index";
-    }
-
     @RequestMapping(path = "/logout", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<String> logoutUser(HttpServletRequest request) {
@@ -259,28 +126,10 @@ public class UserController {
         }
     }
 
-
-    @RequestMapping(path = "/user", method = RequestMethod.GET)
-    public String profile1(Model model, @PathVariable String userId) {
-        User user = new User();
-        user.setFirstName("Julka");
-        user.setCity("Kyiv");
-        model.addAttribute("user", user);
-        return "profile";
+    @RequestMapping(path = "/index", method = RequestMethod.GET)
+    public String getIndex() {
+        return "index";
     }
-
-    /*@RequestMapping(method = RequestMethod.POST, value = "/findUser", produces = "text/plain")
-    public @ResponseBody
-    String findUser(HttpServletRequest req) {
-        String idUser = req.getParameter("idUser");
-        Long id = Long.parseLong(idUser);
-
-        User user= userService.findOne(id);
-
-        if (user == null)
-            return "User id " + id + " doesn't exist in DB";
-        return user.toString();
-    }*/
 
     @RequestMapping(method = RequestMethod.POST, value = "/User/save", produces = "application/json")
     public @ResponseBody
@@ -305,9 +154,7 @@ public class UserController {
 
         } catch (BadRequestException e) {
             return "Update unsuccessful " + e.getMessage();
-        } /*catch (NotFoundException e) {
-            return "Update unsuccessful " + e.getMessage();
-        }*/
+        }
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/User/delete", produces = "application/json")

@@ -1,8 +1,9 @@
-package com.findme.service;
+package com.findme.validator;
 
 import com.findme.BadRequestException;
 import com.findme.LimitExceed;
 import com.findme.dao.RelationShipFrndsDAOImpl;
+import com.findme.dao.UserDAOImpl;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.RelationShipFrnds;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,9 @@ public class CancelChain extends ChainGeneral {
 
 
 @Autowired
-    public CancelChain(RelationShipFrndsDAOImpl relationShipFrndsDAO) {
+    public CancelChain(RelationShipFrndsDAOImpl relationShipFrndsDAO, UserDAOImpl userDAO) {
         this.relationShipDAOImpl = relationShipFrndsDAO;
+        this.userDAO = userDAO;
     }
 
 

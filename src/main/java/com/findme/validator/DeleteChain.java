@@ -1,4 +1,4 @@
-package com.findme.service;
+package com.findme.validator;
 
 import com.findme.BadRequestException;
 import com.findme.LimitExceed;

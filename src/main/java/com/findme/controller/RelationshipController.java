@@ -46,12 +46,9 @@ public class RelationshipController {
             return new ResponseEntity<>("Request sent successfully", HttpStatus.OK);
 
 
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | BadRequestException e) {
             return new ResponseEntity<>("Wrong friend's id. Try again.", HttpStatus.BAD_REQUEST);
 
-        } catch (BadRequestException e) {
-
-            return new ResponseEntity<>("You can not add myself.", HttpStatus.BAD_REQUEST);
         } catch (HttpServerErrorException.InternalServerError e) {
             return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -76,37 +73,11 @@ public class RelationshipController {
 
             return new ResponseEntity<>("Update status sent successfully", HttpStatus.OK);
 
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | BadRequestException e) {
             return new ResponseEntity<>("Wrong friend's id. Try again.", HttpStatus.BAD_REQUEST);
-        } catch (BadRequestException e) {
-            return new ResponseEntity<>("You can not add myself.", HttpStatus.BAD_REQUEST);
-        } catch (HttpServerErrorException.InternalServerError e) {
+        }  catch (HttpServerErrorException.InternalServerError e) {
             return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @RequestMapping(path = "/deleteFriend", method = RequestMethod.POST)
-    public ResponseEntity<String> deleteFriend(HttpServletRequest request, @RequestParam("userIdFromDelete") String userIdFrom, @RequestParam("userIdToDelete") String userIdTo) {
-        try {
-            Long userIdToL = Long.parseLong(userIdTo);
-            Long userIdFromL = Long.parseLong(userIdFrom);
-
-            HttpSession session = request.getSession();
-
-            User userFrom = (User) session.getAttribute("user");
-
-            if (userFrom == null)
-                return new ResponseEntity<>("You have to login", HttpStatus.UNAUTHORIZED);
-
-            relationshipService.updateRelationshipStatus(userIdFromL, userIdToL, RelationShipFriends.DELETE);
-            return new ResponseEntity<>("Request sent successfully", HttpStatus.OK);
-
-        } catch (NumberFormatException e) {
-            return new ResponseEntity<>("Wrong friend's id. Try again.", HttpStatus.BAD_REQUEST);
-        } catch (BadRequestException e) {
-            return new ResponseEntity<>("You can not add myself.", HttpStatus.BAD_REQUEST);
-        } catch (HttpServerErrorException.InternalServerError e) {
-            return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 }

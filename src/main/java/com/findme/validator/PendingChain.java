@@ -1,11 +1,10 @@
-package com.findme.service;
+package com.findme.validator;
 
 import com.findme.BadRequestException;
 import com.findme.LimitExceed;
 import com.findme.dao.RelationShipFrndsDAOImpl;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.RelationShipFrnds;
-import com.findme.service.ChainGeneral;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

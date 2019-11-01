@@ -16,21 +16,4 @@ import java.io.InputStream;
 @EnableWebMvc
 public class MessageController {
 
-    @RequestMapping(method = RequestMethod.POST, value = "/testMessage")
-    public @ResponseBody
-    String testMessage(HttpServletRequest req) {
-        return convertJSONStringToUser(req).toString();
-    }
-
-    private Message convertJSONStringToUser(HttpServletRequest req) {
-        ObjectMapper mapper = new ObjectMapper();
-        try (InputStream is = req.getInputStream()) {
-            Message message = mapper.readValue(is, Message.class);
-
-            return message;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }

@@ -23,29 +23,4 @@ public class PostController {
         this.postService = postService;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/Post/save", produces = "application/json")
-    public @ResponseBody
-    String saveUser(HttpServletRequest req) {
-        Post post = convertJSONStringToPost(req);
-
-        return postService.save(post).toString() + "was saving successful";
-    }
-
-    @RequestMapping(method = RequestMethod.POST, value = "/testPost")
-    public @ResponseBody
-    String testPost(HttpServletRequest req) {
-        return convertJSONStringToPost(req).toString();
-    }
-
-    private Post convertJSONStringToPost(HttpServletRequest req) {
-        ObjectMapper mapper = new ObjectMapper();
-        try (InputStream is = req.getInputStream()) {
-            Post post = mapper.readValue(is, Post.class);
-
-            return post;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }

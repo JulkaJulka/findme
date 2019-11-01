@@ -1,7 +1,8 @@
-package com.findme.service;
+package com.findme.validator;
 
 import com.findme.BadRequestException;
 import com.findme.dao.RelationShipFrndsDAOImpl;
+import com.findme.dao.UserDAOImpl;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.RelationShipFrnds;
 import org.springframework.stereotype.Component;
@@ -12,8 +13,8 @@ public class DispenseChain {
     private Chain chain;
 
 
-    public DispenseChain(RelationShipFrndsDAOImpl relationShipFrndsDAO) {
-        this.chain = new CancelChain(relationShipFrndsDAO);
+    public DispenseChain(RelationShipFrndsDAOImpl relationShipFrndsDAO, UserDAOImpl userDAO) {
+        this.chain = new CancelChain(relationShipFrndsDAO, userDAO);
         Chain c2 = new DeclineChain(relationShipFrndsDAO);
         Chain c3 = new AcceptChain(relationShipFrndsDAO);
         Chain c4 = new DeleteChain(relationShipFrndsDAO);
@@ -24,6 +25,9 @@ public class DispenseChain {
         c3.setNextChain(c4);
         c4.setNextChain(c5);
     }
+public void checkIds(Long userIdFrom, Long userIdTo) throws BadRequestException{
+        chain.validateUserIds(userIdFrom, userIdTo);
+}
 
     public void init( RelationShipFriends status, RelationShipFrnds relationship)throws BadRequestException{
         chain.check(status, relationship);

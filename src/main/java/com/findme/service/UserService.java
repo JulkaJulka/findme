@@ -54,7 +54,7 @@ public class UserService {
         return true;
     }
 
-    @Transactional
+
     public User checkExistanceUserInDB(String email, String password) {
         User findUser = userDAO.checkExistUsDB(email, password);
         if(findUser == null)

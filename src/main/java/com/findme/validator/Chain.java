@@ -1,4 +1,4 @@
-package com.findme.service;
+package com.findme.validator;
 
 import com.findme.BadRequestException;
 import com.findme.LimitExceed;
@@ -9,4 +9,5 @@ public interface Chain {
 
     void setNextChain(Chain nextChain);
     void check(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed;
+    boolean validateUserIds(Long userIdFrom, Long userIdTo) throws BadRequestException;
 }

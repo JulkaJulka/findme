@@ -1,9 +1,8 @@
 package com.findme.config;
 
-import com.findme.BadRequestException;
-import com.findme.LimitExceed;
 import com.findme.dao.RelationShipFrndsDAOImpl;
-import com.findme.service.*;
+import com.findme.dao.UserDAOImpl;
+import com.findme.validator.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +16,6 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.spring5.SpringTemplateEngine;
@@ -101,8 +99,11 @@ public  class AppConfig implements WebMvcConfigurer {
     }
 
     @Bean
+    UserDAOImpl userDAO(){return new UserDAOImpl();}
+
+    @Bean
     CancelChain cancelChain(){
-        return new CancelChain(relationShipFrndsDAO());
+        return new CancelChain(relationShipFrndsDAO(), userDAO());
     }
 
     @Bean
