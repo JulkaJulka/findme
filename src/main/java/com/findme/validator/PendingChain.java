@@ -13,21 +13,19 @@ import java.util.List;
 
 @Component
 public class PendingChain extends ChainGeneral {
-    private static long MAX_AMOUNT_OUTCOME_REQUESTS = 10;
+
+    public long MAX_AMOUNT_OUTCOME_REQUESTS = 10;
 
    @Autowired
     public PendingChain(RelationShipFrndsDAOImpl relationShipFrndsDAO) {
         this.relationShipDAOImpl = relationShipFrndsDAO;
     }
-    
 
     @Override
     public void check(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed {
         if (status == RelationShipFriends.PENDING) {
 
-            List<Long> listPending = relationShipDAOImpl.getRelationsByStatus(relationShipFrnds.getUserFrom().toString(), RelationShipFriends.PENDING);
-            if (listPending != null && listPending.size() >= MAX_AMOUNT_OUTCOME_REQUESTS)
-                throw new LimitExceed("You have already exceed limit max value of outcome requests " + MAX_AMOUNT_OUTCOME_REQUESTS);
+           checkLimitOutRequests(relationShipFrnds.getUserFrom());
 
             if (relationShipFrnds.getStatus() == RelationShipFriends.PENDING || relationShipFrnds.getStatus() == RelationShipFriends.ACCEPT)
                 throw new BadRequestException("Updating from status " + relationShipFrnds.getStatus() +
@@ -40,5 +38,12 @@ public class PendingChain extends ChainGeneral {
             throw new BadRequestException("Updating from status " + relationShipFrnds.getStatus() +
                     " to status " + status + " does not allowed");
         }
+    }
+
+    public void checkLimitOutRequests(Long idFrom) throws LimitExceed{
+
+        List<Long> listPending = relationShipDAOImpl.getRelationsByStatus(idFrom.toString(), RelationShipFriends.PENDING);
+        if (listPending != null && listPending.size() >= MAX_AMOUNT_OUTCOME_REQUESTS)
+            throw new LimitExceed("You have already exceed limit max value of outcome requests " + MAX_AMOUNT_OUTCOME_REQUESTS);
     }
 }

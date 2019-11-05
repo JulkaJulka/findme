@@ -10,4 +10,5 @@ public interface Chain {
     void setNextChain(Chain nextChain);
     void check(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed;
     boolean validateUserIds(Long userIdFrom, Long userIdTo) throws BadRequestException;
+
 }

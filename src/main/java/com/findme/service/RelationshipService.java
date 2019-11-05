@@ -6,11 +6,12 @@ import com.findme.dao.RelationShipFrndsDAOImpl;
 import com.findme.dao.UserDAOImpl;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.RelationShipFrnds;
-import com.findme.model.User;
 import com.findme.validator.DispenseChain;
+import com.findme.validator.PendingChain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -22,9 +23,14 @@ public class RelationshipService {
     private UserDAOImpl userDAO;
     @Autowired
     private DispenseChain dispenseChain;
+    @Autowired
+    private PendingChain pendingChain;
+
 
     public void addRelationship(Long userIdFrom, Long userIdTo) throws BadRequestException {
         dispenseChain.checkIds(userIdFrom, userIdTo);
+
+        pendingChain.checkLimitOutRequests(userIdFrom);
         RelationShipFrnds relationShipFrndsFind = relationShipFrndsDAO.findRelByFromTo(userIdFrom, userIdTo);
 
         if (relationShipFrndsFind == null) {
@@ -32,6 +38,7 @@ public class RelationshipService {
             relationShipFrnds.setUserFrom(userIdFrom);
             relationShipFrnds.setUserTo(userIdTo);
             relationShipFrnds.setStatus(RelationShipFriends.PENDING);
+            relationShipFrnds.setDate_status(new Date());
 
             relationShipFrndsDAO.save(relationShipFrnds);
 

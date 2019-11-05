@@ -7,16 +7,13 @@ import com.findme.dao.UserDAOImpl;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.RelationShipFrnds;
 import com.findme.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class ChainGeneral implements Chain {
 
-    public Chain chain;
 
+    public Chain chain;
     public RelationShipFrndsDAOImpl relationShipDAOImpl;
     public RelationShipFrnds relationShipFrnds;
-
-
     public UserDAOImpl userDAO;
 
 
@@ -58,7 +55,9 @@ public abstract class ChainGeneral implements Chain {
         if (userFind == null)
             throw new BadRequestException("User with id " + userIdTo + "does not exist in DB");
 
+
         return true;
 
     }
+
 }
