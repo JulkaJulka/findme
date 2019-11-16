@@ -28,6 +28,7 @@ public class RelationshipService {
 
 
     public void addRelationship(Long userIdFrom, Long userIdTo) throws BadRequestException {
+        //TODO you don't need any chain here, validation can be done on service layer
         dispenseChain.checkIds(userIdFrom, userIdTo);
 
         pendingChain.checkLimitOutRequests(userIdFrom);

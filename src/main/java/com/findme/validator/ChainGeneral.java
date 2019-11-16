@@ -44,6 +44,7 @@ public abstract class ChainGeneral implements Chain {
         return relationShipFrnds;
     }
 
+    //TODO why is it here?
     public boolean validateUserIds(Long userIdFrom, Long userIdTo) throws BadRequestException {
         if (userIdTo == null || userIdTo <= 0)
             throw new BadRequestException("Wrong userIdTo. Try again");

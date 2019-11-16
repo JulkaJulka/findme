@@ -54,6 +54,7 @@ public class UserController {
             return "profile";
 
         } catch (NumberFormatException e) {
+            //TODO all pages should e renamed - only small letters can be used , use - to separate words
             return "badRequestExcp";
 
         } catch (NotFoundException e) {
@@ -69,6 +70,7 @@ public class UserController {
     @ResponseBody
     public ResponseEntity<String> registerUser(HttpSession session, @ModelAttribute User user) {
         try {
+            //TODO this should be deleted
             session.setAttribute("product1", "iphone");
             user.setDateRegistrated(new Date());
             user.setLastDateActivited(new Date());
@@ -79,10 +81,10 @@ public class UserController {
             System.out.println("bad");
             return new ResponseEntity<>("User can not registered in DB", HttpStatus.BAD_REQUEST);
 
+            //TODO this exception seems strange
         } catch (HttpServerErrorException.InternalServerError ex) {
             return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
