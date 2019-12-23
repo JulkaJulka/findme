@@ -1,5 +1,6 @@
 package com.findme.dao;
 
+import com.findme.exception.InternalServerError;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.RelationShipFrnds;
 import org.springframework.stereotype.Repository;
@@ -83,14 +84,14 @@ public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> 
 
 
     @Transactional
-    public RelationShipFrnds updateRelationship(Long userIdFrom, Long userIdTo, RelationShipFriends status) {
+    public RelationShipFrnds updateRelationship(Long userIdFrom, Long userIdTo, RelationShipFriends status) throws InternalServerError {
         RelationShipFrnds findRelFrnds = findRelByFromTo(userIdFrom, userIdTo);
         findRelFrnds.setDate_status(new Date());
         findRelFrnds.setStatus(status);
         return update(findRelFrnds);
     }
 
-    public RelationShipFrnds findRelByFromTo(Long userFrom, Long userTo) {
+    public RelationShipFrnds findRelByFromTo(Long userFrom, Long userTo) throws InternalServerError {
         Query query = getEntityManager().createQuery(FIND_RELATION_BY_ID);
         query.setParameter("idFrom", userFrom);
         query.setParameter("idTo", userTo);

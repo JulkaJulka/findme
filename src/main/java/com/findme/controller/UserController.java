@@ -1,11 +1,10 @@
 package com.findme.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.findme.BadRequestException;
-import com.findme.LimitExceed;
-import com.findme.NotFoundException;
+import com.findme.exception.BadRequestException;
+import com.findme.exception.InternalServerError;
+import com.findme.exception.NotFoundException;
 import com.findme.dao.RelationShipFrndsDAOImpl;
-import com.findme.model.RelationShipFriends;
 import com.findme.model.User;
 import com.findme.service.RelationshipService;
 import com.findme.service.UserService;
@@ -15,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +21,6 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-import java.util.List;
 
 @Controller
 @EnableWebMvc
@@ -54,13 +50,13 @@ public class UserController {
             return "profile";
 
         } catch (NumberFormatException e) {
-            return "badRequestExcp";
+            return "bad-request-exception";
 
         } catch (NotFoundException e) {
-            return "notFoundException";
+            return "not-found-exception";
 
         } catch (Exception e) {
-            return "systemError";
+            return "system-error";
         }
 
     }
@@ -69,7 +65,6 @@ public class UserController {
     @ResponseBody
     public ResponseEntity<String> registerUser(HttpSession session, @ModelAttribute User user) {
         try {
-            session.setAttribute("product1", "iphone");
             user.setDateRegistrated(new Date());
             user.setLastDateActivited(new Date());
             userService.save(user);
@@ -79,7 +74,7 @@ public class UserController {
             System.out.println("bad");
             return new ResponseEntity<>("User can not registered in DB", HttpStatus.BAD_REQUEST);
 
-        } catch (HttpServerErrorException.InternalServerError ex) {
+        } catch (InternalServerError e) {
             return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -104,7 +99,7 @@ public class UserController {
                 return new ResponseEntity<>("User successfully log in to FindMe", HttpStatus.OK);
             }
 
-        } catch (HttpServerErrorException.InternalServerError e) {
+        } catch (InternalServerError e) {
             return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -112,7 +107,7 @@ public class UserController {
     @RequestMapping(path = "/logout", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<String> logoutUser(HttpServletRequest request) {
-        try {
+
             HttpSession session = request.getSession();
 
             session.removeAttribute("email");
@@ -121,9 +116,6 @@ public class UserController {
 
             return new ResponseEntity<>("User logout successfully", HttpStatus.OK);
 
-        } catch (HttpServerErrorException.InternalServerError e) {
-            return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @RequestMapping(path = "/index", method = RequestMethod.GET)
@@ -141,6 +133,9 @@ public class UserController {
         } catch (BadRequestException e) {
             return "Save unsuccessful " + e.getMessage();
         }
+        catch (InternalServerError e){
+            return "Something went wrong" + e.getMessage();
+        }
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/User/update", produces = "application/json")
@@ -152,8 +147,10 @@ public class UserController {
             userService.update(user);
             return user.toString() + "was updating successful";
 
-        } catch (BadRequestException e) {
+        } catch (BadRequestException | NotFoundException e) {
             return "Update unsuccessful " + e.getMessage();
+        } catch (InternalServerError e){
+            return "Something went wrong" + e.getMessage();
         }
     }
 
@@ -168,10 +165,7 @@ public class UserController {
             userService.delete(idUser);
             return "OK" + "User id " + idUser + " was deleted successfully";
 
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            return "Deleting unsuccessful " + e.getMessage();
-        } catch (NotFoundException e) {
+        } catch (BadRequestException|NotFoundException e) {
             e.printStackTrace();
             return "Deleting unsuccessful " + e.getMessage();
         }

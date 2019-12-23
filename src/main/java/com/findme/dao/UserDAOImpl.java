@@ -1,8 +1,7 @@
 package com.findme.dao;
 
-import com.findme.BadRequestException;
+import com.findme.exception.InternalServerError;
 import com.findme.model.User;
-import org.hibernate.query.NativeQuery;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -34,7 +33,7 @@ public class UserDAOImpl extends GenericDAOImpl<User> implements UserDAO {
 
     @Transactional
     @Override
-    public User checkExistUsDB(String email, String password) throws NonUniqueResultException {
+    public User checkExistUsDB(String email, String password) throws NonUniqueResultException, InternalServerError {
 
         Query query = getEntityManager().createQuery(FIND_USER_BY_EMAIL_PSWD);
         query.setParameter("email", email);

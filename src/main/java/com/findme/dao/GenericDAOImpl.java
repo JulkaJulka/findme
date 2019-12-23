@@ -1,12 +1,11 @@
 package com.findme.dao;
 
-import com.findme.BadRequestException;
+import com.findme.exception.InternalServerError;
 import org.springframework.core.GenericTypeResolver;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-import java.io.Serializable;
 
 
 public class GenericDAOImpl<T> implements GenericDAO<T>{
@@ -31,7 +30,7 @@ public class GenericDAOImpl<T> implements GenericDAO<T>{
 
     @Override
     @Transactional
-    public T save(Object entity) {
+    public T save(Object entity) throws InternalServerError {
         entityManager.persist(entity);
         return (T)entity;
     }
@@ -44,7 +43,7 @@ public class GenericDAOImpl<T> implements GenericDAO<T>{
 
     @Transactional
     @Override
-    public T update(Object entity)  {
+    public T update(Object entity) throws InternalServerError  {
         return entityManager.merge( (T)entity);
     }
 }

@@ -1,12 +1,12 @@
 package com.findme.validator;
 
-import com.findme.BadRequestException;
-import com.findme.LimitExceed;
+import com.findme.exception.BadRequestException;
+import com.findme.exception.InternalServerError;
+import com.findme.exception.LimitExceed;
 import com.findme.dao.RelationShipFrndsDAOImpl;
 import com.findme.dao.UserDAOImpl;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.RelationShipFrnds;
-import com.findme.model.User;
 
 public abstract class ChainGeneral implements Chain {
 
@@ -38,26 +38,11 @@ public abstract class ChainGeneral implements Chain {
     }
 
     @Override
-    public abstract void check(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed;
+    public abstract void check(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, InternalServerError, LimitExceed;
 
     public RelationShipFrnds getRelationShipFrnds() {
         return relationShipFrnds;
     }
 
-    public boolean validateUserIds(Long userIdFrom, Long userIdTo) throws BadRequestException {
-        if (userIdTo == null || userIdTo <= 0)
-            throw new BadRequestException("Wrong userIdTo. Try again");
-        if (userIdFrom == userIdTo)
-            throw new BadRequestException("You can not send request  myself");
-
-        User userFind = userDAO.findOne(userIdTo);
-
-        if (userFind == null)
-            throw new BadRequestException("User with id " + userIdTo + "does not exist in DB");
-
-
-        return true;
-
-    }
 
 }

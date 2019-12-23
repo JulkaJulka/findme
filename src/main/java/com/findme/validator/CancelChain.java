@@ -1,7 +1,8 @@
 package com.findme.validator;
 
-import com.findme.BadRequestException;
-import com.findme.LimitExceed;
+import com.findme.exception.BadRequestException;
+import com.findme.exception.InternalServerError;
+import com.findme.exception.LimitExceed;
 import com.findme.dao.RelationShipFrndsDAOImpl;
 import com.findme.dao.UserDAOImpl;
 import com.findme.model.RelationShipFriends;
@@ -25,7 +26,7 @@ public class CancelChain extends ChainGeneral {
 
 
     @Override
-    public void check(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed {
+    public void check(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, InternalServerError, LimitExceed {
 
         if (relationShipFrnds == null)
             throw new BadRequestException("You have to add friends " + relationShipFrnds.getUserTo());

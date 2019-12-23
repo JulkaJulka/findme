@@ -1,11 +1,13 @@
 package com.findme.service;
 
-import com.findme.BadRequestException;
-import com.findme.LimitExceed;
+import com.findme.exception.BadRequestException;
+import com.findme.exception.InternalServerError;
+import com.findme.exception.LimitExceed;
 import com.findme.dao.RelationShipFrndsDAOImpl;
 import com.findme.dao.UserDAOImpl;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.RelationShipFrnds;
+import com.findme.model.User;
 import com.findme.validator.DispenseChain;
 import com.findme.validator.PendingChain;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,20 +19,20 @@ import java.util.List;
 @Service
 public class RelationshipService {
 
+    public long MAX_AMOUNT_OUTCOME_REQUESTS = 10;
+
     @Autowired
     private RelationShipFrndsDAOImpl relationShipFrndsDAO;
     @Autowired
     private UserDAOImpl userDAO;
     @Autowired
     private DispenseChain dispenseChain;
-    @Autowired
-    private PendingChain pendingChain;
 
+    public void addRelationship(Long userIdFrom, Long userIdTo) throws BadRequestException,InternalServerError {
 
-    public void addRelationship(Long userIdFrom, Long userIdTo) throws BadRequestException {
-        dispenseChain.checkIds(userIdFrom, userIdTo);
+        validateUserIds(userIdFrom, userIdTo);
+        checkLimitOutRequests(userIdFrom);
 
-        pendingChain.checkLimitOutRequests(userIdFrom);
         RelationShipFrnds relationShipFrndsFind = relationShipFrndsDAO.findRelByFromTo(userIdFrom, userIdTo);
 
         if (relationShipFrndsFind == null) {
@@ -47,19 +49,36 @@ public class RelationshipService {
         }
     }
 
-    public List<Long> getIncomeRequests(String userId) {
-        return relationShipFrndsDAO.getIncomeRequests(userId);
-    }
+    public RelationShipFrnds updateRelationshipStatus(Long userIdFrom, Long userIdTo, RelationShipFriends status) throws BadRequestException, InternalServerError {
 
-    public List<Long> getOutcomeRequests(String userId) {
-        return relationShipFrndsDAO.getOutcomeRequests(userId);
-    }
-
-    public RelationShipFrnds updateRelationshipStatus(Long userIdFrom, Long userIdTo, RelationShipFriends status) throws BadRequestException {
-        dispenseChain.checkIds(userIdFrom, userIdTo);
+        validateUserIds(userIdFrom, userIdTo);
         RelationShipFrnds relationShipFrnds = relationShipFrndsDAO.findRelByFromTo(userIdFrom, userIdTo);
+
         dispenseChain.init(status, relationShipFrnds);
+
         return relationShipFrnds;
+
+    }
+
+    public boolean validateUserIds(Long userIdFrom, Long userIdTo) throws BadRequestException {
+        if (userIdTo == null || userIdTo <= 0)
+            throw new BadRequestException("Wrong userIdTo. Try again");
+        if (userIdFrom == userIdTo)
+            throw new BadRequestException("You can not send request  myself");
+
+        User userFind = userDAO.findOne(userIdTo);
+
+        if (userFind == null)
+            throw new BadRequestException("User with id " + userIdTo + "does not exist in DB");
+
+        return true;
+    }
+
+    public void checkLimitOutRequests(Long userIdFrom) throws LimitExceed {
+        List<Long> listPending = relationShipFrndsDAO.getRelationsByStatus(userIdFrom.toString(), RelationShipFriends.PENDING);
+
+        if (listPending != null && listPending.size() >= MAX_AMOUNT_OUTCOME_REQUESTS)
+            throw new LimitExceed("You have exceed limit of outcome requests");
     }
 
 

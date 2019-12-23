@@ -1,7 +1,8 @@
 package com.findme.validator;
 
-import com.findme.BadRequestException;
-import com.findme.LimitExceed;
+import com.findme.exception.BadRequestException;
+import com.findme.exception.InternalServerError;
+import com.findme.exception.LimitExceed;
 import com.findme.dao.RelationShipFrndsDAOImpl;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.RelationShipFrnds;
@@ -9,12 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.List;
 
 @Component
 public class PendingChain extends ChainGeneral {
-
-    public long MAX_AMOUNT_OUTCOME_REQUESTS = 10;
 
    @Autowired
     public PendingChain(RelationShipFrndsDAOImpl relationShipFrndsDAO) {
@@ -22,10 +20,8 @@ public class PendingChain extends ChainGeneral {
     }
 
     @Override
-    public void check(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed {
+    public void check(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, InternalServerError, LimitExceed {
         if (status == RelationShipFriends.PENDING) {
-
-           checkLimitOutRequests(relationShipFrnds.getUserFrom());
 
             if (relationShipFrnds.getStatus() == RelationShipFriends.PENDING || relationShipFrnds.getStatus() == RelationShipFriends.ACCEPT)
                 throw new BadRequestException("Updating from status " + relationShipFrnds.getStatus() +
@@ -40,10 +36,4 @@ public class PendingChain extends ChainGeneral {
         }
     }
 
-    public void checkLimitOutRequests(Long idFrom) throws LimitExceed{
-
-        List<Long> listPending = relationShipDAOImpl.getRelationsByStatus(idFrom.toString(), RelationShipFriends.PENDING);
-        if (listPending != null && listPending.size() >= MAX_AMOUNT_OUTCOME_REQUESTS)
-            throw new LimitExceed("You have already exceed limit max value of outcome requests " + MAX_AMOUNT_OUTCOME_REQUESTS);
-    }
 }

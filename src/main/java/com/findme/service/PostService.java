@@ -1,8 +1,8 @@
 package com.findme.service;
 
-import com.findme.BadRequestException;
+import com.findme.exception.BadRequestException;
 import com.findme.dao.GenericDAOImpl;
-import com.findme.dao.PostDAO;
+import com.findme.exception.InternalServerError;
 import com.findme.model.Post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ public class PostService {
         return postDAO.findOne(id);
     }
 
-    public Post save(Post entity) {
+    public Post save(Post entity) throws InternalServerError {
         return postDAO.save(entity);
     }
 
@@ -25,7 +25,7 @@ public class PostService {
         postDAO.delete(id);
     }
 
-    public Post update(Post entity) throws BadRequestException {
+    public Post update(Post entity) throws BadRequestException, InternalServerError {
         checkExistenceEntityInDB(entity.getId());
         return  postDAO.update(entity);
 

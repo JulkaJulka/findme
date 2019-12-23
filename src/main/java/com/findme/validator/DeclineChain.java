@@ -1,7 +1,8 @@
 package com.findme.validator;
 
-import com.findme.BadRequestException;
-import com.findme.LimitExceed;
+import com.findme.exception.BadRequestException;
+import com.findme.exception.InternalServerError;
+import com.findme.exception.LimitExceed;
 import com.findme.dao.RelationShipFrndsDAOImpl;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.RelationShipFrnds;
@@ -19,7 +20,7 @@ public class DeclineChain extends ChainGeneral {
     }
 
     @Override
-    public void check(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, LimitExceed {
+    public void check(RelationShipFriends status, RelationShipFrnds relationShipFrnds) throws BadRequestException, InternalServerError, LimitExceed {
         if (status == RelationShipFriends.DECLINE && getRelationShipFrnds().getStatus() == RelationShipFriends.PENDING) {
             getRelationShipFrnds().setStatus(status);
             relationShipFrnds.setDate_status(new Date());

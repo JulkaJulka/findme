@@ -1,8 +1,9 @@
 package com.findme.validator;
 
-import com.findme.BadRequestException;
+import com.findme.exception.BadRequestException;
 import com.findme.dao.RelationShipFrndsDAOImpl;
 import com.findme.dao.UserDAOImpl;
+import com.findme.exception.InternalServerError;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.RelationShipFrnds;
 import org.springframework.stereotype.Component;
@@ -25,11 +26,8 @@ public class DispenseChain {
         c3.setNextChain(c4);
         c4.setNextChain(c5);
     }
-public void checkIds(Long userIdFrom, Long userIdTo) throws BadRequestException{
-        chain.validateUserIds(userIdFrom, userIdTo);
-}
 
-    public void init( RelationShipFriends status, RelationShipFrnds relationship)throws BadRequestException{
+    public void init( RelationShipFriends status, RelationShipFrnds relationship)throws BadRequestException, InternalServerError {
         chain.check(status, relationship);
     }
 }

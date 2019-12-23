@@ -1,17 +1,14 @@
 package com.findme.service;
 
-import com.findme.BadRequestException;
-import com.findme.NotFoundException;
-import com.findme.dao.GenericDAO;
-import com.findme.dao.GenericDAOImpl;
-import com.findme.dao.UserDAO;
+import com.findme.exception.BadRequestException;
+import com.findme.exception.InternalServerError;
+import com.findme.exception.NotFoundException;
 import com.findme.dao.UserDAOImpl;
 import com.findme.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
 
 @Service
 public class UserService {
@@ -26,7 +23,7 @@ public class UserService {
     }
 
     @Transactional
-    public User save(User entity) throws BadRequestException {
+    public User save(User entity) throws BadRequestException, InternalServerError {
         if (userDAO.findByPhoneOrEmail(entity) != null)
             throw new BadRequestException("User with email " + entity.getEmail() + " or phone " + entity.getPhone() + " already exist in DB. Try again, please");
 
@@ -42,8 +39,8 @@ public class UserService {
         userDAO.delete(id);
     }
 
-    public User update(User entity) throws BadRequestException {
-       // checkExistenceEntityInDB(entity.getId());
+    public User update(User entity) throws BadRequestException, InternalServerError, NotFoundException {
+        checkExistenceEntityInDB(entity.getId());
         return userDAO.update(entity);
 
     }
@@ -55,7 +52,7 @@ public class UserService {
     }
 
 
-    public User checkExistanceUserInDB(String email, String password) {
+    public User checkExistanceUserInDB(String email, String password) throws InternalServerError {
         User findUser = userDAO.checkExistUsDB(email, password);
         if(findUser == null)
             return null;

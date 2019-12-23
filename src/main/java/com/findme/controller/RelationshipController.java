@@ -1,9 +1,10 @@
 package com.findme.controller;
 
-import com.findme.BadRequestException;
+import com.findme.exception.BadRequestException;
 import com.findme.model.RelationShipFriends;
 import com.findme.model.User;
 import com.findme.service.RelationshipService;
+import com.findme.exception.InternalServerError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +50,7 @@ public class RelationshipController {
         } catch (NumberFormatException | BadRequestException e) {
             return new ResponseEntity<>("Wrong friend's id. Try again.", HttpStatus.BAD_REQUEST);
 
-        } catch (HttpServerErrorException.InternalServerError e) {
+        } catch (InternalServerError e) {
             return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -68,14 +69,13 @@ public class RelationshipController {
             if (userFrom == null)
                 return new ResponseEntity<>("You have to login", HttpStatus.UNAUTHORIZED);
 
-
             relationshipService.updateRelationshipStatus(userIdFromL, userIdToL, RelationShipFriends.valueOf(status));
 
             return new ResponseEntity<>("Update status sent successfully", HttpStatus.OK);
 
         } catch (NumberFormatException | BadRequestException e) {
             return new ResponseEntity<>("Wrong friend's id. Try again.", HttpStatus.BAD_REQUEST);
-        }  catch (HttpServerErrorException.InternalServerError e) {
+        }  catch (InternalServerError e) {
             return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
