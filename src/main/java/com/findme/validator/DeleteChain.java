@@ -32,21 +32,20 @@ public class DeleteChain extends ChainGeneral {
             calMax.add(Calendar.DATE, -3);
             Date dateMaxForCompare = calMax.getTime();
 
+            if (dateMaxForCompare.compareTo(dateStatus.getTime()) >= 0) {
+                relationShipFrnds.setStatus(status);
+                relationShipFrnds.setDate_status(new Date());
+                getRelationShipDAOImpl().update(relationShipFrnds);
+            }
 
-            if (relationShipFrnds.getStatus() == RelationShipFriends.ACCEPT) {
-                if (dateMaxForCompare.compareTo(dateStatus.getTime()) >= 0) {
-                    relationShipFrnds.setStatus(status);
-                    relationShipFrnds.setDate_status(new Date());
-                    getRelationShipDAOImpl().update(relationShipFrnds);
-                } else {
-                    throw new BadRequestException("You have not permission to delete id " + relationShipFrnds.getUserTo());
-                }
+            if (dateMaxForCompare.compareTo(dateStatus.getTime()) < 0) {
+                throw new BadRequestException("You have not permission to delete id " + relationShipFrnds.getUserTo());
             }
 
         } else
 
         {
-        this.chain.check(status, relationShipFrnds);
+            this.chain.check(status, relationShipFrnds);
         }
-}
+    }
 }

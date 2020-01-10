@@ -9,12 +9,12 @@ import com.findme.model.RelationShipFrnds;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DispenseChain {
+public class Handler {
 
     private Chain chain;
 
 
-    public DispenseChain(RelationShipFrndsDAOImpl relationShipFrndsDAO, UserDAOImpl userDAO) {
+    public Handler(RelationShipFrndsDAOImpl relationShipFrndsDAO, UserDAOImpl userDAO) {
         this.chain = new CancelChain(relationShipFrndsDAO, userDAO);
         Chain c2 = new DeclineChain(relationShipFrndsDAO);
         Chain c3 = new AcceptChain(relationShipFrndsDAO);
