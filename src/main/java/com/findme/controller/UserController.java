@@ -123,6 +123,11 @@ public class UserController {
         return "index";
     }
 
+    @RequestMapping(path = "/profile", method = RequestMethod.GET)
+    public String getProfile() {
+        return "profile";
+    }
+
     @RequestMapping(method = RequestMethod.POST, value = "/User/save", produces = "application/json")
     public @ResponseBody
     String saveUser(HttpServletRequest req) {

@@ -19,10 +19,25 @@ public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> 
     private static String FIND_RELATION_BY_ID = "from RelationShipFrnds WHERE USER_FROM = :idFrom AND USER_TO = :idTo ";
     private static String FIND_RELATION_BY_ID_ANSW = "SELECT r.userFrom FROM RelationShipFrnds r WHERE  r.userTo = :idAnsw AND r.status = :status ";
     private static String FIND_BY_IDFRPOM_STATUS = "SELECT r.userTo FROM RelationShipFrnds r WHERE  r.userFrom = :userFrom AND r.status = :status ";
+    private static String ID_FROM_ID_TO_ACCEPT = "SELECT r.userTo FROM RelationShipFrnds r WHERE  ((r.userFrom = :userFrom AND r.userTo = :userTo) OR (r.userFrom = :userTo AND r.userTo = :userFrom))" +
+            " AND r.status = :status ";
 
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    public boolean isBetweenUsersAccept(Long idFrom, Long idTo){
+        Query query = getEntityManager().createQuery(ID_FROM_ID_TO_ACCEPT);
+        query.setParameter("userFrom", idFrom);
+        query.setParameter("userTo", idTo);
+        query.setParameter("status", RelationShipFriends.ACCEPT);
+
+        List results = query.getResultList();
+
+        if (results.isEmpty())
+            return false;
+        return true;
+    }
 
     @Override
     public void answerToRequestFriend(Long idReq, Long idAnsw) {

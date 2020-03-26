@@ -53,7 +53,7 @@
                 <input path="id_friend"
                        class="inputtext _58mg _5dba _2ph-"
                        name="id_friend"
-                       id="u_0_n"  placeholder="id friend" >
+                       id="u_0_n" placeholder="id friend">
 
                 <button class="btn" type="submit" name="addRelationship">addRelationship</button>
 
@@ -65,82 +65,151 @@
                 <input path="userIdFrom"
                        class="inputtext _58mg _5dba _2ph-"
                        name="userIdFrom"
-                       id="u_0_f"  placeholder="id friendFromUpdate" required>
+                       id="u_0_f" placeholder="id friendFromUpdate" required>
 
                 <input path="userIdTo"
                        class="inputtext _58mg _5dba _2ph-"
                        name="userIdTo"
-                       id="u_0_u"  placeholder="id friendUpdate" required>
+                       id="u_0_u" placeholder="id friendUpdate" required>
 
                 <input path="status"
                        class="inputtext _58mg _5dba _2ph-"
                        name="status"
-                       id="u_0_s"  placeholder="status" required>
+                       id="u_0_s" placeholder="status" required>
 
                 <button class="btn" type="submit" name="updateRelationship">updateRelationship</button>
 
             </form>
         </div>
         <div>
-           <!--<button id="getRequest" class="btn" type="submit" name="getRequest" href="/user/reqflist">Requests to add to friends </button>-->
-            <button onclick="window.location='/user/reqflist'">Requests to add to friends </button>
-            <button onclick="window.location='/user/outflist'">Your Outcome requests to add Friends  </button>
+            <!--<button id="getRequest" class="btn" type="submit" name="getRequest" href="/user/reqflist">Requests to add to friends </button>-->
+            <button onclick="window.location='/user/reqflist'">Requests to add to friends</button>
+            <button onclick="window.location='/user/outflist'">Your Outcome requests to add Friends</button>
         </div>
+        <form id="form-post" action="/post-create">
+        <div>
+            <div>
 
+            <textarea path="message" title="Post." class="uiTextareaNoResize uiTextareaAutogrow input mentionsTextarea textInput"
+                      placeholder="Your Post..." role="textbox" aria-autocomplete="list"
+                      autocomplete="new-password" aria-expanded="false" aria-controls="typeahead_list_u_0_5"
+                      aria-haspopup="true" id="u_0_uP"
+                      tabindex="0" aria-label="Расскажите об этом что-нибудь..."></textarea>
+
+            </div>
+            <div>
+
+                <input path="location"
+                       class="inputtext _58mg _5dba _2ph- inner"
+                       name="location"
+                       id="u_0_sL" placeholder="location" required>
+
+            </div>
+            <div>
+                <input path="usersIDTagged"
+                       class="inputtext _58mg _5dba _2ph-"
+                       name="usersTagged"
+                       id="u_0_uList" placeholder="id listUsersTagged" required>
+
+            </div>
+
+                <input path="userIdPosted"
+                       class="inputtext _58mg _5dba _2ph-"
+                       name="userIdPosted"
+                       id="u_0_uPosted" placeholder="id usersPosted" required>
+
+            </div>
+            <div>
+            <input path="userIdPagePosted"
+                   class="inputtext _58mg _5dba _2ph-"
+                   name="userPagePosted"
+                   id="u_0_uPagePosted" placeholder="id userPagePosted" required>
+                <div>
+                    <button  type="submit" name="post">POST</button>
+                </div>
+            </div>
+        </form>
+        </div>
     </div>
 </div>
 <button id="test-ajax">Sign out</button>
 
 </body>
 <script>
-   /* $('#getRequest').click(function () {
+    /* $('#getRequest').click(function () {
 
-        $.getJSON('GetCities', function (data) {
+         $.getJSON('GetCities', function (data) {
 
-            $("ul#output > li").remove();
+             $("ul#output > li").remove();
 
-            $.each(data, function (key, value) {
-                $("#output").append('<li>' + value['name'] + " " + value['population'] + '</li>');
-            });
-        });
+             $.each(data, function (key, value) {
+                 $("#output").append('<li>' + value['name'] + " " + value['population'] + '</li>');
+             });
+         });
+     });*/
+
+    /*$.ajax({
+        url: "/user/reqfliest",
+        type: 'GET',
+        success: function(response) {
+            var requestList = response.data;
+            console.log(requestList);
+        }
     });*/
+    /* function getReqFriens(callback) {
+         var url = "/user/regflist";
+         $.ajax({
+             type: 'GET',
+             url: url,
+             success: function (data) {
+                 //data will be the response from the server (the api's)
+                 // If it's not already in a list (array) then you have to build it up
+                 //Example:
+                 var array = [];
+                 for (var i = 0; i < data.requestlist.length; i++) {
+                     array.push(data[i]);
+                 }
+                 callback(array);
+             },
+             error: function (err) {
+                 alert('error!');
+                 console.log(err); //prints error object to console
+             }
 
-   /*$.ajax({
-       url: "/user/reqfliest",
-       type: 'GET',
-       success: function(response) {
-           var requestList = response.data;
-           console.log(requestList);
-       }
-   });*/
-  /* function getReqFriens(callback) {
-       var url = "/user/regflist";
-       $.ajax({
-           type: 'GET',
-           url: url,
-           success: function (data) {
-               //data will be the response from the server (the api's)
-               // If it's not already in a list (array) then you have to build it up
-               //Example:
-               var array = [];
-               for (var i = 0; i < data.requestlist.length; i++) {
-                   array.push(data[i]);
-               }
-               callback(array);
-           },
-           error: function (err) {
-               alert('error!');
-               console.log(err); //prints error object to console
-           }
+         });
+     }
 
-       });
-   }
+     function getsCalledWhenFinished(apiArray) {
+         //do whatever you want with the data..
+     }
 
-   function getsCalledWhenFinished(apiArray) {
-       //do whatever you want with the data..
-   }
+     getAPIArray(getsCalledWhenFinished);*/
+    $("#form-post").submit(function (e) {
+        var form = $(this).serialize();
+        $.ajax({
+            type: "POST",
+            url: "/post-create",
+            data: form,
 
-   getAPIArray(getsCalledWhenFinished);*/
+            success: function success() {
+                debugger;
+                alert("Post is created succsesfully");
+                window.location.href = 'profile';
+                // $(this).load('testForRedirect.html');
+            },
+            error: function error(e) {
+                debugger;
+                if(e.status === 400){
+                    alert("Wrong password or email. Try again please.");
+                    window.location.href = 'index';
+
+                }
+                // $(this).load('testForRedirect.html');
+
+            }
+        });
+        e.preventDefault();
+    })
     $("#form-addRelationship").submit(function (e) {
         var form = $(this).serialize();
         $.ajax({
@@ -155,18 +224,18 @@
                 // $(this).load('testForRedirect.html');
             },
             error: function error(e) {
-                if(e.status === 401){
+                if (e.status === 401) {
                     alert("You have not permissions. Please, login to site");
                     window.location.href = 'index';
 
                 }
-                if(e.status === 400){
+                if (e.status === 400) {
                     alert("Wrong friend's id. Try again.");
                     window.location.href = 'index';
 
                 }
 
-                if(e.status === 500){
+                if (e.status === 500) {
                     alert("Something went wrong.. .");
                     window.location.href = 'index';
 
@@ -178,44 +247,44 @@
         e.preventDefault();
     })
 
-   $("#form-updateRelationship").submit(function (e) {
-       var form = $(this).serialize();
-       $.ajax({
-           type: "POST",
-           url: "/updateRelationship",
-           data: form,
+    $("#form-updateRelationship").submit(function (e) {
+        var form = $(this).serialize();
+        $.ajax({
+            type: "POST",
+            url: "/updateRelationship",
+            data: form,
 
-           success: function success() {
-               debugger;
-               alert("Update is  successfully");
-               window.location.href = 'profile';
-               // $(this).load('testForRedirect.html');
-           },
-           error: function error(e) {
+            success: function success() {
+                debugger;
+                alert("Update is  successfully");
+                window.location.href = 'profile';
+                // $(this).load('testForRedirect.html');
+            },
+            error: function error(e) {
 
-               if(e.status === 400){
-                   alert("Wrong friend's id. Try again.");
-                   window.location.href = 'index';
+                if (e.status === 400) {
+                    alert("Wrong friend's id. Try again.");
+                    window.location.href = 'index';
 
-               }
+                }
 
-               if(e.status === 401){
-                   alert("You have not permissions. Please, login to site");
-                   window.location.href = 'index';
+                if (e.status === 401) {
+                    alert("You have not permissions. Please, login to site");
+                    window.location.href = 'index';
 
-               }
+                }
 
-               if(e.status === 500){
-                   alert("Something went wrong.. .");
-                   window.location.href = 'index';
+                if (e.status === 500) {
+                    alert("Something went wrong.. .");
+                    window.location.href = 'index';
 
-               }
-               // $(this).load('testForRedirect.html');
+                }
+                // $(this).load('testForRedirect.html');
 
-           }
-       });
-       e.preventDefault();
-   })
+            }
+        });
+        e.preventDefault();
+    })
 
     $("#test-ajax").click(function () {
         $.ajax({
@@ -238,25 +307,31 @@
     });
 </script>
 <style>
-    .left{
+    .left {
         float: left;
         width: 200px;
         height: 300px;
         border-style: solid;
     }
-    .right{
+
+    .right {
         margin-left: 800px;
     }
 
-    .btn{
+    .btn {
         margin-top: 230px;
     }
+
     .bblock {
         float: left; /*Задаем обтекание*/
         font-size: 40px;
         width: 150px; /*Фиксируем ширину блока*/
         margin-right: 10px;
         text-align: left; /*Центрируем текст по горизонтали*/
+    }
+
+    .inner {
+        display: inline-block;
     }
 </style>
 </html>
