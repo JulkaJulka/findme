@@ -22,13 +22,7 @@ public class PostService {
     }
 
     public Post save(Post entity, Long idFrom, Long idTo) throws InternalServerError, BadRequestException {
-        if (entity == null)
-            throw new BadRequestException("Post doesn't be empty.Pls, write the text");
-
-        if (idFrom != idTo) {
-            if (!relationShipFrndsDAO.isBetweenUsersAccept(idFrom, idTo))
-                throw new BadRequestException("You do not have permission. Add to your friends");
-        }
+        validatePost(entity, idFrom, idTo);
         return postDAO.save(entity);
     }
 
@@ -47,6 +41,22 @@ public class PostService {
         Post findEntity = findOne(id);
         if (findEntity == null) throw new BadRequestException(" with id " + id + "doesn't exist in DB");
         return true;
+    }
+
+    private void validatePost(Post entity, Long idFrom, Long idTo) throws BadRequestException {
+        if (entity != null && entity.getMessage() == null || entity.getMessage().isEmpty())
+            throw new BadRequestException("Post doesn't be empty.Pls, write the text");
+
+        if (entity.getMessage() != null && entity.getMessage().length() > 200)
+            throw new BadRequestException("Max length of message must be 200 symbols");
+
+        if (entity.getMessage().contains("https://") || entity.getMessage().contains("http://"))
+            throw new BadRequestException("Message does not contain references");
+
+        if (idFrom != idTo) {
+            if (!relationShipFrndsDAO.isBetweenUsersAccept(idFrom, idTo))
+                throw new BadRequestException("You do not have permission. Add to your friends");
+        }
     }
 
 }
