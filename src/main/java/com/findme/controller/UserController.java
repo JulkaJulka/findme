@@ -94,6 +94,7 @@ public class UserController {
                 return new ResponseEntity<>("Wrong password or email. Try again please.", HttpStatus.BAD_REQUEST);
 
             } else {
+
                 session.setAttribute("user", userFound);
 
                 return new ResponseEntity<>("User successfully log in to FindMe", HttpStatus.OK);
@@ -193,5 +194,7 @@ public class UserController {
         }
         return null;
     }
+
+
 
 }

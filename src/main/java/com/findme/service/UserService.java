@@ -27,7 +27,6 @@ public class UserService {
         if (userDAO.findByPhoneOrEmail(entity) != null)
             throw new BadRequestException("User with email " + entity.getEmail() + " or phone " + entity.getPhone() + " already exist in DB. Try again, please");
 
-      //  System.out.println(userDAO.findByPhoneOrEmail(entity).toString());
         User saveUser = userDAO.save(entity);
         return saveUser;
 
@@ -45,7 +44,7 @@ public class UserService {
 
     }
 
-    public boolean checkExistenceEntityInDB(Long id) throws BadRequestException, NotFoundException {
+    public boolean checkExistenceEntityInDB(Long id) throws  NotFoundException {
         User findEntity = findOne(id);
         if (findEntity == null) throw new NotFoundException(" with id " + id + "doesn't exist in DB");
         return true;

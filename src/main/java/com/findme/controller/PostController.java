@@ -8,8 +8,6 @@ import com.findme.model.Post;
 import com.findme.model.User;
 import com.findme.service.PostService;
 import com.findme.service.UserService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -19,6 +17,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.List;
 
 @Controller
 @EnableWebMvc
@@ -32,24 +31,27 @@ public class PostController {
         this.userService = userService;
     }
 
-    @RequestMapping(path = "/post-create", method = RequestMethod.POST, produces = "application/json")
-    public @ResponseBody String createPost(HttpServletRequest request, @RequestParam("userIdPagePosted") String userIdPagePosted) {
+    @RequestMapping(path = "/post-create", method = RequestMethod.POST, produces = {"application/json", "application/x-www-form-urlencoded"})
+    public @ResponseBody
+    String createPost(HttpServletRequest request, @RequestParam("userIdPagePosted") String userIdPagePosted) {
         try {
             HttpSession session = request.getSession();
 
             User userPosted = (User) session.getAttribute("user");
             userService.findOne(userPosted.getId());
 
-            Post post = convertJSONStringToPost(request);
-
             Long idUserTo = Long.parseLong(userIdPagePosted);
+
+            Post post = convertJSONStringToPost(request);
 
             post.setDatePosted(new Date());
             post.setUserPosted(userPosted);
 
             User userPagePosted = userService.findOne(idUserTo);
-            post.setUserPagePosted(userPagePosted);
 
+            post.setUsersTagged(postService.createTaggedUsersFromMessage(post.getMessage()));
+
+            post.setUserPagePosted(userPagePosted);
             postService.save(post, userPosted.getId(), idUserTo);
             return post.toString() + "Post is registered successfully";
 
@@ -59,6 +61,17 @@ public class PostController {
             return "Something went wrong..." + e.getMessage();
         }
     }
+
+    @RequestMapping(path = "/listPost", method = RequestMethod.POST, produces = "application/json")
+    public @ResponseBody
+    List<Post> listPostByUserPagePostedId(@RequestParam String userId) {
+        try {
+            return postService.postListByUserPagePostedId(userId);
+        } catch (BadRequestException e) {
+            return null;
+        }
+    }
+
 
     private Post convertJSONStringToPost(HttpServletRequest req) {
         ObjectMapper mapper = new ObjectMapper();

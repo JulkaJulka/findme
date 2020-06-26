@@ -81,9 +81,6 @@ public class RelationshipService {
             throw new LimitExceed("You have exceed limit of outcome requests");
     }
 
-    public boolean isBetweenUsersAccept(Long idFrom, Long idTo){
-        return  relationShipFrndsDAO.isBetweenUsersAccept(idFrom,idTo);
-    }
 
 
 }

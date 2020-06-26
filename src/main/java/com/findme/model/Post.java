@@ -19,6 +19,8 @@ public class Post {
     private User userPosted;
     private User userPagePosted;
 
+
+
     //TODO
     //levels permissions
 
@@ -27,6 +29,7 @@ public class Post {
 
     public Post() {
     }
+
 
     @Id
     @SequenceGenerator(name = "POST_SEQ", sequenceName = "POST_SEQ", allocationSize = 1)
@@ -47,15 +50,17 @@ public class Post {
     public Date getDatePosted() {
         return datePosted;
     }
+
     @Column (name = "LOCATION")
     public String getLocation() {
         return location;
     }
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY)
+   @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "POST_USER_TAGGED", joinColumns =
             {@JoinColumn(name = "POST_ID")}, inverseJoinColumns = {@JoinColumn(name = "USER_TAGGED_ID")})
+
     public Set<User> getUsersTagged() {
         return usersTagged;
     }
@@ -121,46 +126,16 @@ public class Post {
         return Objects.hash(id, message, datePosted, location, userPosted, userPagePosted);
     }
 
-/* @Id
-    @SequenceGenerator(name = "POST_SEQ", sequenceName = "POST_SEQ", allocationSize = 1)
-    @GeneratedValue(generator = "POST_SEQ", strategy = GenerationType.SEQUENCE)
-    public Long getId() {
-        return id;
-    }
-
-    @Temporal(value = TemporalType.DATE)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
-    @Column(name = "DATE_POSTED")
-    public Date getDatePosted() {
-        return datePosted;
-    }
-
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "USER_POSTED", nullable = false)
-    public User getUserPosted() {
-        return userPosted;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setDatePosted(Date datePosted) {
-        this.datePosted = datePosted;
-    }
-
-    public void setUserPosted(User userPosted) {
-        this.userPosted = userPosted;
-    }*/
-
-    @Override
+  @Override
     public String toString() {
         return "Post{" +
                 "id=" + id +
                 ", message='" + message + '\'' +
                 ", datePosted=" + datePosted +
                 ", location='" + location + '\'' +
+                ", usersTagged=" + usersTagged +
+                ", userPosted=" + userPosted +
+                ", userPagePosted=" + userPagePosted +
                 '}';
     }
 }

@@ -2,8 +2,12 @@ package com.findme.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.persistence.*;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -271,4 +275,5 @@ public class User {
                 ", email='" + email + '\'' +
                 '}';
     }
+
 }
