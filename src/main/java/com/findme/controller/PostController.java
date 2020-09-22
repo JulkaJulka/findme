@@ -33,25 +33,20 @@ public class PostController {
 
     @RequestMapping(path = "/post-create", method = RequestMethod.POST, produces = {"application/json", "application/x-www-form-urlencoded"})
     public @ResponseBody
-    String createPost(HttpServletRequest request, @RequestParam("userIdPagePosted") String userIdPagePosted) {
+    String createPost(HttpServletRequest request,@RequestBody Post post, @RequestParam("userIdPagePosted") String userIdPagePosted){
         try {
             HttpSession session = request.getSession();
 
             User userPosted = (User) session.getAttribute("user");
-            userService.findOne(userPosted.getId());
 
             Long idUserTo = Long.parseLong(userIdPagePosted);
-
-            Post post = convertJSONStringToPost(request);
+            post.setUserPagePosted(userService.setUserPagePosted(userPosted.getId(),idUserTo));
 
             post.setDatePosted(new Date());
             post.setUserPosted(userPosted);
 
-            User userPagePosted = userService.findOne(idUserTo);
-
             post.setUsersTagged(postService.createTaggedUsersFromMessage(post.getMessage()));
 
-            post.setUserPagePosted(userPagePosted);
             postService.save(post, userPosted.getId(), idUserTo);
             return post.toString() + "Post is registered successfully";
 
@@ -59,8 +54,7 @@ public class PostController {
             return "Save unsuccessful " + e.getMessage();
         } catch (InternalServerError e) {
             return "Something went wrong..." + e.getMessage();
-        }
-    }
+        }}
 
     @RequestMapping(path = "/listPost", method = RequestMethod.POST, produces = "application/json")
     public @ResponseBody
@@ -72,16 +66,4 @@ public class PostController {
         }
     }
 
-
-    private Post convertJSONStringToPost(HttpServletRequest req) {
-        ObjectMapper mapper = new ObjectMapper();
-        try (InputStream is = req.getInputStream()) {
-            Post post = mapper.readValue(is, Post.class);
-
-            return post;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }

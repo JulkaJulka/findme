@@ -1,6 +1,8 @@
 package com.findme.dao;
 
+import com.findme.exception.BadRequestException;
 import com.findme.exception.InternalServerError;
+import com.findme.exception.NotFoundException;
 import com.findme.model.User;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +11,10 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public class UserDAOImpl extends GenericDAOImpl<User> implements UserDAO {
@@ -30,6 +35,27 @@ public class UserDAOImpl extends GenericDAOImpl<User> implements UserDAO {
         System.out.println(query.getResultList().toString());
         return query.getResultList();
     }
+
+
+    @Transactional
+    public User setUserPagePostedId(Long idUserFrom, Long idUserTo) throws NotFoundException {
+
+            Query queryFrom = getEntityManager().createQuery("from User where id = " + idUserFrom);
+
+            if(queryFrom.getSingleResult() == null)
+                throw new NotFoundException("UserFrom with id " + idUserFrom + " does not exist in DB" );
+
+        Query queryTo = getEntityManager().createQuery("from User where id = " + idUserTo );
+
+        if(queryTo.getSingleResult() == null)
+            throw new NotFoundException("UserTo with id " + idUserTo + " does not exist in DB" );
+
+        User userTo = (User) queryTo.getSingleResult();
+
+        return userTo;
+
+    }
+
 
     @Transactional
     @Override

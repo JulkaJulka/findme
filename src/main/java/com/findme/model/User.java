@@ -2,7 +2,6 @@ package com.findme.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.persistence.*;
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +43,7 @@ public class User {
     // private String[] interests;
 
     public User() {
+        setDateRegistrated(new Date());
     }
 
     @Id

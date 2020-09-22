@@ -25,12 +25,13 @@ import java.util.Date;
 @Controller
 @EnableWebMvc
 public class UserController {
+
     private UserService userService;
     private RelationshipService relationshipService;
     private RelationShipFrndsDAOImpl relationShipFrndsDAO;
 
 
-    @Autowired
+  //  @Autowired
     public UserController(UserService userService, RelationshipService relationshipService, RelationShipFrndsDAOImpl relationShipFrndsDAO) {
         this.userService = userService;
         this.relationshipService = relationshipService;
@@ -129,10 +130,11 @@ public class UserController {
         return "profile";
     }
 
+
+
     @RequestMapping(method = RequestMethod.POST, value = "/User/save", produces = "application/json")
     public @ResponseBody
-    String saveUser(HttpServletRequest req) {
-        User user = convertJSONStringToUser(req);
+    String saveUser(@RequestBody User user) {
 
         try {
             return userService.save(user).toString() + "was saving successful";
@@ -146,14 +148,13 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.PUT, value = "/User/update", produces = "application/json")
     public @ResponseBody
-    String updateUser(HttpServletRequest req) {
-        User user = convertJSONStringToUser(req);
+    String updateUser(@RequestBody User user) {
 
         try {
             userService.update(user);
             return user.toString() + "was updating successful";
 
-        } catch (BadRequestException | NotFoundException e) {
+        } catch ( NotFoundException e) {
             return "Update unsuccessful " + e.getMessage();
         } catch (InternalServerError e){
             return "Something went wrong" + e.getMessage();
@@ -176,25 +177,6 @@ public class UserController {
             return "Deleting unsuccessful " + e.getMessage();
         }
     }
-
-    @RequestMapping(method = RequestMethod.POST, value = "/testUser")
-    public @ResponseBody
-    String testUser(HttpServletRequest req) {
-        return convertJSONStringToUser(req).toString();
-    }
-
-    private User convertJSONStringToUser(HttpServletRequest req) {
-        ObjectMapper mapper = new ObjectMapper();
-        try (InputStream is = req.getInputStream()) {
-            User user = mapper.readValue(is, User.class);
-
-            return user;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 
 
 }

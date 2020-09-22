@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -21,6 +22,15 @@ public class UserService {
             throw new NotFoundException("User id " + id + " not found in DB");
         return user;
     }
+
+@Transactional
+    public User setUserPagePosted(Long idUserFrom, Long idUserTo) throws BadRequestException, NotFoundException{
+    if(idUserFrom == null || idUserTo == null)
+        throw new BadRequestException("Enter Users ids");
+    return userDAO.setUserPagePostedId(idUserFrom, idUserTo);
+}
+
+
 
     @Transactional
     public User save(User entity) throws BadRequestException, InternalServerError {
@@ -38,7 +48,8 @@ public class UserService {
         userDAO.delete(id);
     }
 
-    public User update(User entity) throws BadRequestException, InternalServerError, NotFoundException {
+   @Transactional
+    public User update(User entity) throws  InternalServerError, NotFoundException {
         checkExistenceEntityInDB(entity.getId());
         return userDAO.update(entity);
 

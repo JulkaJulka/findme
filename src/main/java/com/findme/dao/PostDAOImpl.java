@@ -1,5 +1,6 @@
 package com.findme.dao;
 
+import com.findme.exception.NotFoundException;
 import com.findme.model.Post;
 import com.findme.model.User;
 import com.findme.service.UserService;
@@ -10,7 +11,10 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public class PostDAOImpl extends GenericDAOImpl<Post> implements PostDAO {
@@ -37,6 +41,7 @@ private static String FIND_POSTS_BY_USER_PAGE_POSTED_ID =  " SELECT * FROM POST 
 
         return results;
     }
+
 
 
     @Override
