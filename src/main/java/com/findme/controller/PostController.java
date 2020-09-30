@@ -1,9 +1,9 @@
 package com.findme.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.findme.exception.BadRequestException;
 import com.findme.exception.InternalServerError;
 import com.findme.exception.NotFoundException;
+import com.findme.model.Filter;
 import com.findme.model.Post;
 import com.findme.model.User;
 import com.findme.service.PostService;
@@ -56,14 +56,12 @@ public class PostController {
             return "Something went wrong..." + e.getMessage();
         }}
 
-    @RequestMapping(path = "/listPost", method = RequestMethod.POST, produces = "application/json")
-    public @ResponseBody
-    List<Post> listPostByUserPagePostedId(@RequestParam String userId) {
-        try {
-            return postService.postListByUserPagePostedId(userId);
-        } catch (BadRequestException e) {
-            return null;
+
+    @RequestMapping(path = "/posts-by-user-page", method = RequestMethod.POST, produces = {"application/json", "application/x-www-form-urlencoded"})
+        public  @ResponseBody List<Post> allPostsByUserPagedId(@RequestBody Filter filter, @RequestParam("idUserPage") String idUserPage) throws BadRequestException{
+
+                return postService.allPostsUserPaged(filter, idUserPage);
+
         }
-    }
 
 }

@@ -1,60 +1,68 @@
 package com.findme.dao;
 
-import com.findme.exception.NotFoundException;
-import com.findme.model.Post;
-import com.findme.model.User;
-import com.findme.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.findme.exception.BadRequestException;
+import com.findme.model.*;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.persistence.*;
 import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Repository
 public class PostDAOImpl extends GenericDAOImpl<Post> implements PostDAO {
-
-    private static String FIND_ALL_EXIST_POSTS = " SELECT * FROM POST p JOIN(SELECT put.POST_ID, p1.ID_POST as p1_ID, put.USER_TAGGED_ID FROM POST_USER_TAGGED put RIGHT JOIN POST p1 ON p1.ID_POST = put.POST_ID ) un " +
-            "ON p.ID_POST = un.p1_ID LEFT JOIN USER_FM ON un.USER_TAGGED_ID = ID_USER ORDER BY p.DATE_POSTED DESC";
-
-private static String FIND_POSTS_BY_USER_PAGE_POSTED_ID =  " SELECT * FROM POST p JOIN(SELECT put.POST_ID, p1.ID_POST as p1_ID, put.USER_TAGGED_ID FROM POST_USER_TAGGED put RIGHT JOIN POST p1 ON p1.ID_POST = put.POST_ID " +
-        "WHERE p1.USER_PAGE_POSTED_ID = ?) un ON p.ID_POST = un.p1_ID LEFT JOIN USER_FM ON un.USER_TAGGED_ID = ID_USER ORDER BY p.DATE_POSTED DESC";
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Transactional
     @Override
-    public List<Post> listPostByUserPagePostedId(String userId) {
+    public List<Post> listPostsOfUserPagedId(Filter filter, String userPagedId) throws BadRequestException {
 
-        Query query = getEntityManager().createNativeQuery(FIND_POSTS_BY_USER_PAGE_POSTED_ID);
-        query.setParameter(1, Long.parseLong(userId) );
-        List results = query.getResultList();
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> filterParams = objectMapper.convertValue(filter, Map.class);
 
-        if (results.isEmpty())
-            return null;
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
-        return results;
+        CriteriaQuery cq = cb.createQuery(Post.class);
+        Root<Post> rootPost = cq.from(Post.class);
+
+        rootPost.fetch("usersTagged", JoinType.LEFT);
+        rootPost.fetch("userPosted", JoinType.LEFT);
+        rootPost.fetch("userPagePosted", JoinType.LEFT);
+
+        Predicate p = cb.equal(rootPost.get("userPagePosted").get("id"), Long.parseLong(userPagedId));
+        CriteriaQuery cq1 = cq.where(p);
+
+        validFilterParam(filterParams);
+
+        for (String param : filterParams.keySet()) {
+            if (filterParams.get(param) != null) {
+
+                if (param.equals("idUser")) {
+                    cq1 = cq1.where(cb.and(p, cb.equal(
+                            rootPost.get("userPosted").get("id"), filterParams.get(param))));
+                }
+                if (param.equals("id")) {
+                    cq1 = cq1.where(cb.and(p, cb.notEqual(
+                            rootPost.get("userPosted").get("id"), filterParams.get(param))));
+                }
+            }
+
+        }
+        return entityManager.createQuery(cq1).getResultList();
     }
 
-
-
-    @Override
-    public List<Post> listAllPost() {
-
-        Query query = getEntityManager().createNativeQuery(FIND_ALL_EXIST_POSTS);
-
-        List results = query.getResultList();
-
-        if (results.isEmpty())
-            return null;
-
-        return results;
+    private void validFilterParam(Map<String, Object> filterParams) throws BadRequestException {
+        int count = 0;
+        for (Object v : filterParams.values()) {
+            if (v != null) {
+                count++;
+            }
+        }
+        if (count > 1)
+            throw new BadRequestException("input only 1 parametr");
     }
 
 

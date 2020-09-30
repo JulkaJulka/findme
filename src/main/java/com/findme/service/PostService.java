@@ -7,6 +7,7 @@ import com.findme.exception.BadRequestException;
 import com.findme.dao.GenericDAOImpl;
 import com.findme.exception.InternalServerError;
 import com.findme.exception.NotFoundException;
+import com.findme.model.Filter;
 import com.findme.model.Post;
 import com.findme.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,12 +50,8 @@ public class PostService {
     }
 
     @Transactional
-    public List<Post> postListByUserPagePostedId(String userId) throws BadRequestException{
-        userDAO.findOne(Long.parseLong(userId));
-       return postDAO.listPostByUserPagePostedId(userId);
-    }
-    public List<Post> allExistPosts(){
-       return postDAO.listAllPost();
+    public List<Post> allPostsUserPaged(Filter filter, String userPagedId) throws BadRequestException{
+       return postDAO.listPostsOfUserPagedId(filter,userPagedId);
     }
 
 

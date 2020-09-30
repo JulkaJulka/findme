@@ -57,7 +57,7 @@ public class Post {
         return location;
     }
 
-    @JsonIgnore
+
    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "POST_USER_TAGGED", joinColumns =
             {@JoinColumn(name = "POST_ID")}, inverseJoinColumns = {@JoinColumn(name = "USER_TAGGED_ID")})
@@ -66,14 +66,14 @@ public class Post {
         return usersTagged;
     }
 
-    @JsonIgnore
+
     @OneToOne(cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_POSTED_ID")
     public User getUserPosted() {
         return userPosted;
     }
 
-    @JsonIgnore
+
     @OneToOne(cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_PAGE_POSTED_ID")
     public User getUserPagePosted() {
