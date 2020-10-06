@@ -1,5 +1,6 @@
 package com.findme.service;
 
+import com.findme.Utils;
 import com.findme.dao.PostDAOImpl;
 import com.findme.dao.RelationShipFrndsDAOImpl;
 import com.findme.dao.UserDAOImpl;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,52 +52,37 @@ public class PostService {
     }
 
     @Transactional
-    public List<Post> allPostsUserPaged(Filter filter, String userPagedId) throws BadRequestException{
-       return postDAO.listPostsOfUserPagedId(filter,userPagedId);
+    public List<Post> allPostsUserPaged(Filter filter, String userPagedId) throws BadRequestException {
+        return postDAO.listPostsOfUserPagedId(filter, userPagedId);
     }
 
 
-    public Set<User> createTaggedUsersFromMessage(String message) throws NotFoundException{
+    public Set<User> createTaggedUsersFromMessage(String message) throws NotFoundException, BadRequestException {
         return usersTaggedList(taggedUsersId(message));
     }
 
-    public Long[] taggedUsersId(String message) {
+    public Long[] taggedUsersId(String message) throws BadRequestException {
         if (message == null || message.isEmpty())
-            System.out.println("write message,pls");
+            System.out.println("Write message, pls");
+
         String[] words = message.trim().split(" ");
+        return createArrayUsersFromWord(words);
 
-        for (int i = 0; i <words.length ; i++) {
-
-            if (words[i].length() > 4 && words[i].substring(0, 4).equals("Ids:")) {
-                words[i] = words[i].substring(4, words[i].length());
-                String[] idsS = words[i].split(",");
-                Long[] idsL = new Long[idsS.length];
-
-                for (int k = 0; k < idsS.length ; k++) {
-                    idsL[k] = Long.parseLong(idsS[k]);
-                }
-                return idsL;
-
-            }
-        }
-        return null;
     }
 
     public Set<User> usersTaggedList(Long[] mas) throws NotFoundException {
-        if(mas == null || mas.length == 0)
+        if (mas == null || mas.length == 0)
             return null;
         Set<User> taggedUsers = new HashSet<>();
         for (int i = 0; i < mas.length; i++) {
 
-            if(!userService.checkExistenceEntityInDB(mas[i]))
-            throw new NotFoundException("User with Id " + mas[i] + " is not found in DB. Please, check the UserTagged list again.");
+            if (!userService.checkExistenceEntityInDB(mas[i]))
+                throw new NotFoundException("User with Id " + mas[i] + " is not found in DB. Please, check the UserTagged list again.");
 
             taggedUsers.add(userService.findOne(mas[i]));
         }
         return taggedUsers;
     }
-
-
 
 
     public boolean checkExistenceEntityInDB(Long id) throws BadRequestException {
@@ -118,6 +105,30 @@ public class PostService {
             if (!relationShipFrndsDAO.isBetweenUsersAccept(idFrom, idTo))
                 throw new BadRequestException("You do not have permission. Add to your friends");
         }
+    }
+    
+    private Long[] createArrayUsersFromWord(String[] words) throws BadRequestException {
+        for (String w : words) {
+            if (w.startsWith("Ids:") && w.length() > 4) {
+                w = w.replace("Ids:", "");
+
+                String[] idsS = w.split(",");
+                Long[] idsL = new Long[idsS.length];
+
+                int index = 0;
+                for (String c : idsS) {
+                    if (!Utils.check(c))
+                        throw new BadRequestException("Ids are incorrect. Input only numbers separated by commas");
+
+                    idsL[index] = Long.parseLong(idsS[index]);
+                    index++;
+                }
+                return idsL;
+
+            }
+
+        }
+        return null;
     }
 
 }
