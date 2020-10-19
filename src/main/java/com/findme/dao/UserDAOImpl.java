@@ -1,6 +1,5 @@
 package com.findme.dao;
 
-import com.findme.exception.BadRequestException;
 import com.findme.exception.InternalServerError;
 import com.findme.exception.NotFoundException;
 import com.findme.model.User;
@@ -11,10 +10,7 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 @Repository
 public class UserDAOImpl extends GenericDAOImpl<User> implements UserDAO {

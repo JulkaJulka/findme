@@ -5,7 +5,6 @@ import com.findme.dao.PostDAOImpl;
 import com.findme.dao.RelationShipFrndsDAOImpl;
 import com.findme.dao.UserDAOImpl;
 import com.findme.exception.BadRequestException;
-import com.findme.dao.GenericDAOImpl;
 import com.findme.exception.InternalServerError;
 import com.findme.exception.NotFoundException;
 import com.findme.model.Filter;
@@ -15,10 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+
 
 @Service
 public class PostService {
@@ -30,6 +28,8 @@ public class PostService {
     private UserDAOImpl userDAO;
     @Autowired
     private UserService userService;
+
+    private static int PAGE_SIZE = 2;
 
     public Post findOne(Long id) {
         return postDAO.findOne(id);
@@ -52,10 +52,29 @@ public class PostService {
     }
 
     @Transactional
+    public  List<Post> listNewsFeed(String id) {
+
+        return postDAO.listNewsFeed(id);
+
+    }
+
+    public  <T>List<T> getPage(List<T> sourceList, int page) {
+        if(PAGE_SIZE <= 0 || page <= 0) {
+            throw new IllegalArgumentException("invalid page size: " + PAGE_SIZE);
+        }
+
+        int fromIndex = (page - 1) * PAGE_SIZE;
+        if(sourceList == null || sourceList.size() < fromIndex){
+            return Collections.emptyList();
+        }
+
+        return sourceList.subList(fromIndex, Math.min(fromIndex + PAGE_SIZE, sourceList.size()));
+    }
+
+    @Transactional
     public List<Post> allPostsUserPaged(Filter filter, String userPagedId) throws BadRequestException {
         return postDAO.listPostsOfUserPagedId(filter, userPagedId);
     }
-
 
     public Set<User> createTaggedUsersFromMessage(String message) throws NotFoundException, BadRequestException {
         return usersTaggedList(taggedUsersId(message));
@@ -106,7 +125,7 @@ public class PostService {
                 throw new BadRequestException("You do not have permission. Add to your friends");
         }
     }
-    
+
     private Long[] createArrayUsersFromWord(String[] words) throws BadRequestException {
         for (String w : words) {
             if (w.startsWith("Ids:") && w.length() > 4) {

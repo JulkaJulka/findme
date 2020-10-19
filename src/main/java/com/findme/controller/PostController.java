@@ -1,5 +1,7 @@
 package com.findme.controller;
 
+import com.findme.dao.PostDAOImpl;
+import com.findme.dao.RelationShipFrndsDAOImpl;
 import com.findme.exception.BadRequestException;
 import com.findme.exception.InternalServerError;
 import com.findme.exception.NotFoundException;
@@ -14,8 +16,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
@@ -26,21 +26,28 @@ public class PostController {
     private PostService postService;
     private UserService userService;
 
-    public PostController(PostService postService, UserService userService) {
+     public PostController(PostService postService, UserService userService) {
         this.postService = postService;
         this.userService = userService;
     }
 
+    @RequestMapping(path = "/feed", method = RequestMethod.POST, produces = {"application/json", "application/x-www-form-urlencoded"})
+    public @ResponseBody
+    List<Post> listNewsFeed(@RequestParam("userId") String userId, @RequestParam("page") String page) {
+
+        return postService.getPage(postService.listNewsFeed(userId), Integer.parseInt(page));
+    }
+
     @RequestMapping(path = "/post-create", method = RequestMethod.POST, produces = {"application/json", "application/x-www-form-urlencoded"})
     public @ResponseBody
-    String createPost(HttpServletRequest request,@RequestBody Post post, @RequestParam("userIdPagePosted") String userIdPagePosted){
+    String createPost(HttpServletRequest request, @RequestBody Post post, @RequestParam("userIdPagePosted") String userIdPagePosted) {
         try {
             HttpSession session = request.getSession();
 
             User userPosted = (User) session.getAttribute("user");
 
             Long idUserTo = Long.parseLong(userIdPagePosted);
-            post.setUserPagePosted(userService.setUserPagePosted(userPosted.getId(),idUserTo));
+            post.setUserPagePosted(userService.setUserPagePosted(userPosted.getId(), idUserTo));
 
             post.setDatePosted(new Date());
             post.setUserPosted(userPosted);
@@ -54,14 +61,15 @@ public class PostController {
             return "Save unsuccessful " + e.getMessage();
         } catch (InternalServerError e) {
             return "Something went wrong..." + e.getMessage();
-        }}
-
+        }
+    }
 
     @RequestMapping(path = "/posts-by-user-page", method = RequestMethod.POST, produces = {"application/json", "application/x-www-form-urlencoded"})
-        public  @ResponseBody List<Post> allPostsByUserPagedId(@RequestBody Filter filter, @RequestParam("idUserPage") String idUserPage) throws BadRequestException{
+    public @ResponseBody
+    List<Post> allPostsByUserPagedId(@RequestBody Filter filter, @RequestParam("idUserPage") String idUserPage) throws BadRequestException {
 
-                return postService.allPostsUserPaged(filter, idUserPage);
+        return postService.allPostsUserPaged(filter, idUserPage);
 
-        }
+    }
 
 }

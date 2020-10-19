@@ -18,13 +18,39 @@ public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> 
 
     private static String FIND_RELATION_BY_ID = "from RelationShipFrnds WHERE USER_FROM = :idFrom AND USER_TO = :idTo ";
     private static String FIND_RELATION_BY_ID_ANSW = "SELECT r.userFrom FROM RelationShipFrnds r WHERE  r.userTo = :idAnsw AND r.status = :status ";
-    private static String FIND_BY_IDFRPOM_STATUS = "SELECT r.userTo FROM RelationShipFrnds r WHERE  r.userFrom = :userFrom AND r.status = :status ";
+    private static String FIND_BY_IDFRPOM_STATUS = "SELECT r.userTo FROM RelationShipFrnds r WHERE  (r.userFrom = :userFrom OR r.userTo = :userFrom)AND r.status = :status ";
     private static String ID_FROM_ID_TO_ACCEPT = "SELECT r.userTo FROM RelationShipFrnds r WHERE  ((r.userFrom = :userFrom AND r.userTo = :userTo) OR (r.userFrom = :userTo AND r.userTo = :userFrom))" +
             " AND r.status = :status ";
 
-
+    private static String FIND_USER_TO_BY_STATUS_USER_FROM = " SELECT r.userTo FROM RelationShipFrnds r WHERE  r.userFrom = :userFrom AND r.status = :status " ;
+    private static String FIND_USER_TO_BY_STATUS_USER_TO = " SELECT r.userFrom FROM RelationShipFrnds r WHERE  r.userTo = :userFrom AND r.status = :status " ;
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Transactional
+    public List<Long> getUsersWithAccept(String userId) {
+
+        Long userIdL = Long.parseLong(userId);
+        Query queryUserFrom = getEntityManager().createQuery(FIND_USER_TO_BY_STATUS_USER_FROM);
+        queryUserFrom.setParameter("userFrom", userIdL);
+        queryUserFrom.setParameter("status", RelationShipFriends.ACCEPT);
+
+
+        Query queryUserTo = getEntityManager().createQuery(FIND_USER_TO_BY_STATUS_USER_TO);
+        queryUserTo.setParameter("userFrom", userIdL);
+        queryUserTo.setParameter("status", RelationShipFriends.ACCEPT);
+
+        List resultUserTo = queryUserTo.getResultList();
+        List resultUserFrom = queryUserFrom.getResultList();
+
+        if (resultUserTo.isEmpty() && resultUserFrom.isEmpty())
+            return null;
+
+        resultUserTo.addAll(resultUserFrom);
+
+
+        return resultUserTo;
+    }
 
     public boolean isBetweenUsersAccept(Long idFrom, Long idTo){
         Query query = getEntityManager().createQuery(ID_FROM_ID_TO_ACCEPT);
@@ -74,9 +100,7 @@ public class RelationShipFrndsDAOImpl extends GenericDAOImpl<RelationShipFrnds> 
         return results;
     }
 
-    public List<Long> getFriends(String userId) {
-        return getRelationsByStatus(userId, RelationShipFriends.ACCEPT);
-    }
+
 
     @Override
     public List<Long> getOutcomeRequests(String userId) {

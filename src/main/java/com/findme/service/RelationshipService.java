@@ -12,6 +12,7 @@ import com.findme.validator.Handler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 
@@ -26,6 +27,11 @@ public class RelationshipService {
     private UserDAOImpl userDAO;
     @Autowired
     private Handler handler;
+
+    @Transactional
+    public List<Long> listUsersWithStatusAcceptById(String id){
+        return relationShipFrndsDAO.getUsersWithAccept(id);
+    }
 
     public void addRelationship(Long userIdFrom, Long userIdTo) throws BadRequestException,InternalServerError {
 
