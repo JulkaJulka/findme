@@ -8,6 +8,7 @@ import com.findme.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -43,7 +44,7 @@ public class UserService {
 
     }
 
-    public void delete(Long id) throws NotFoundException, BadRequestException {
+    public void delete(Long id) throws NotFoundException {
         checkExistenceEntityInDB(id);
         userDAO.delete(id);
     }

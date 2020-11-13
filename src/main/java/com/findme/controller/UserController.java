@@ -8,6 +8,7 @@ import com.findme.dao.RelationShipFrndsDAOImpl;
 import com.findme.model.User;
 import com.findme.service.RelationshipService;
 import com.findme.service.UserService;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,9 @@ public class UserController {
     private RelationShipFrndsDAOImpl relationShipFrndsDAO;
 
 
-  //  @Autowired
+    private final static Logger logger = Logger.getLogger(UserController.class);
+
+    //  @Autowired
     public UserController(UserService userService, RelationshipService relationshipService, RelationShipFrndsDAOImpl relationShipFrndsDAO) {
         this.userService = userService;
         this.relationshipService = relationshipService;
@@ -39,7 +42,7 @@ public class UserController {
     }
 
     @RequestMapping(path = "/user/{userId}", method = RequestMethod.GET)
-    public String profile(Model model, @PathVariable String userId) {
+    public String profile(HttpSession session,Model model, @PathVariable String userId) {
 
 
         try {
@@ -48,16 +51,18 @@ public class UserController {
 
             User user = userService.findOne(idLong);
             model.addAttribute("user", user);
+
+            logger.info("SessionId: " + session.getId() + "; /user/" + userId );
             return "profile";
 
         } catch (NumberFormatException e) {
+            logger.warn("User id has wrong format, enter only numbers. Please, try again.");
             return "bad-request-exception";
 
         } catch (NotFoundException e) {
+            logger.warn("SessionId: " + session.getId() + "; User Id: " + userId + " does not exist in DB");
             return "not-found-exception";
 
-        } catch (Exception e) {
-            return "system-error";
         }
 
     }
@@ -68,14 +73,21 @@ public class UserController {
         try {
             user.setDateRegistrated(new Date());
             user.setLastDateActivited(new Date());
+
+            logger.info("SessionId: " + session.getId() + "; Saving new user");
             userService.save(user);
+            logger.info("SessionId: " + session.getId() + "; User registered. UserId: " + user.getId());
+
             return new ResponseEntity<>("User registered successfully", HttpStatus.OK);
 
         } catch (BadRequestException e) {
+            logger.warn("User with email: " + user.getEmail() + " or phone " + user.getPhone() + " already exist in DB. Please, try again.");
             System.out.println("bad");
             return new ResponseEntity<>("User can not registered in DB", HttpStatus.BAD_REQUEST);
 
         } catch (InternalServerError e) {
+            logger.error("SessionId: " + session.getId() + "; Unexpected error during user login");
+            logger.error(e);
             return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -92,16 +104,17 @@ public class UserController {
             User userFound = userService.checkExistanceUserInDB(email, password);
 
             if (userFound == null) {
-                return new ResponseEntity<>("Wrong password or email. Try again please.", HttpStatus.BAD_REQUEST);
-
+                logger.warn("SessionId: " + session.getId() + "; User with email: " + email + " password: " + password + " not found");
+                return new ResponseEntity<>("Wrong password or email. Try again please.", HttpStatus.FORBIDDEN);
             } else {
-
                 session.setAttribute("user", userFound);
-
+                logger.info("SessionId: " + session.getId() + "; User successfully logged. UserId: " + userFound.getId());
                 return new ResponseEntity<>("User successfully log in to FindMe", HttpStatus.OK);
             }
 
         } catch (InternalServerError e) {
+            logger.error("SessionId: " + request.getSession().getId() + "; Unexpected error during user login");
+            logger.error(e);
             return new ResponseEntity<>("Something went wrong...", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -110,13 +123,13 @@ public class UserController {
     @ResponseBody
     public ResponseEntity<String> logoutUser(HttpServletRequest request) {
 
-            HttpSession session = request.getSession();
+        HttpSession session = request.getSession();
+        String id = session.getAttribute("id").toString();
+        session.removeAttribute("email");
+        session.removeAttribute("id");
 
-            session.removeAttribute("email");
-            session.removeAttribute("id");
-
-
-            return new ResponseEntity<>("User logout successfully", HttpStatus.OK);
+        logger.info("SessionId: " + session.getId() + "; User successfully logout. UserId: " + id);
+        return new ResponseEntity<>("User logout successfully", HttpStatus.OK);
 
     }
 
@@ -131,32 +144,45 @@ public class UserController {
     }
 
 
-
     @RequestMapping(method = RequestMethod.POST, value = "/User/save", produces = "application/json")
     public @ResponseBody
-    String saveUser(@RequestBody User user) {
+    String saveUser(HttpSession session, @RequestBody User user) {
 
         try {
-            return userService.save(user).toString() + "was saving successful";
+            logger.info("SessionId: " + session.getId() + "; Saving new user");
+            User user1 = userService.save(user);
+            logger.info("SessionId: " + session.getId() + "; User has been saved. UserId: " + user.getId());
+
+            return user1 + "was saving successful";
+
         } catch (BadRequestException e) {
+            logger.warn("SessionId: " + session.getId() + "; User with email: " + user.getEmail() + " already exist in DB");
             return "Save unsuccessful " + e.getMessage();
-        }
-        catch (InternalServerError e){
+
+        } catch (InternalServerError e) {
+            logger.error("SessionId: " + session.getId() + "; Unexpected error during user login");
+            logger.error(e);
             return "Something went wrong" + e.getMessage();
         }
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/User/update", produces = "application/json")
     public @ResponseBody
-    String updateUser(@RequestBody User user) {
+    String updateUser(HttpSession session, @RequestBody User user) {
 
         try {
+            logger.info("SessionId: " + session.getId() + "; Update user Id: " + user.getId());
             userService.update(user);
+            logger.info("SessionId: " + session.getId() + "; User has updated. UserId: " + user.getId());
             return user.toString() + "was updating successful";
 
-        } catch ( NotFoundException e) {
+        } catch (NotFoundException e) {
+            logger.warn("SessionId: " + session.getId() + "; User update unsuccessfully. UserId: " + user.getId() + " does not exist in DB");
             return "Update unsuccessful " + e.getMessage();
-        } catch (InternalServerError e){
+
+        } catch (InternalServerError e) {
+            logger.error("SessionId: " + session.getId() + "; Unexpected error during user login");
+            logger.error(e);
             return "Something went wrong" + e.getMessage();
         }
     }
@@ -165,16 +191,20 @@ public class UserController {
     public @ResponseBody
     String deleteUser(HttpServletRequest req) {
 
+
         String id = req.getParameter("idUser");
         Long idUser = Long.parseLong(id);
 
         try {
+            logger.info("SessionId: " + req.getSession().getId() + "; Delete user Id: " + id);
             userService.delete(idUser);
+            logger.info("SessionId: " + req.getSession().getId() + "; User has successfully deleted. UserId: " + id);
             return "OK" + "User id " + idUser + " was deleted successfully";
 
-        } catch (BadRequestException|NotFoundException e) {
-            e.printStackTrace();
-            return "Deleting unsuccessful " + e.getMessage();
+        } catch (NotFoundException e) {
+            logger.warn("SessionId: " + req.getSession().getId() + "; User deleted unsuccessfully. UserId: " + id + " does not exist in DB");
+            // e.printStackTrace();
+            return "Deleting unsuccessfully " + e.getMessage();
         }
     }
 
